@@ -541,6 +541,7 @@ boolean setTheTime() {
 		if (checkButton()) {
 			//setTime(timeSetTime);
 			RTC.set(timeSetTime);
+			setSyncProvider(RTC.get);  // Forces a sync at next check of time
 			buttonOff();
 			state = 0;
 			return true;

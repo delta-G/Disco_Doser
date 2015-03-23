@@ -22,7 +22,7 @@
 #endif
 
 #include <avr/pgmspace.h>
-#include <SPI.h>
+#include "SPI.h"
 #include "DS3234RTC.h"
 
 const int CONTROL_R = 0x0e;

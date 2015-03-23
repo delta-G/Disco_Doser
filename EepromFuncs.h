@@ -2,7 +2,7 @@
 #define EepromFuncs_h
 
 
-#include <EEPROM.h>
+#include "EEPROM.h"
 
 
 template<class T>

@@ -5,7 +5,7 @@
 #ifndef DS3234RTC_h
 #define DS3234RTC_h
 
-#include <Time.h>
+#include "Time.h"
 
 // RTC based on the DS3234 chip connected via SPI and the SPI library
 class DS3234RTC

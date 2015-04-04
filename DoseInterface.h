@@ -3,6 +3,7 @@
 
 #include "Arduino.h"
 #include "pins_arduino.h"
+#include "DoseHead.h"
 
 
 void initButton();

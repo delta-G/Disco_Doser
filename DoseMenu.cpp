@@ -692,13 +692,16 @@ boolean setBoosterDoseMenuItem() {
 		//  Fix this to also take other boosters into account
 		//  Need that boosterActive flag in DoseSchedule done
 
+		//  **TODO
+		//  Fix this to allow for negative numbers
+
 		int maxAllow = ((getSchedule(scheduleChoice)->getMaxVolume()
-				- getSchedule(scheduleChoice)->getDailyVolume()) * 13);
+				- getSchedule(scheduleChoice)->getDailyVolume()) * (MAXIMUM_BOOSTER_DAYS -1));
 		if (maxAllow > 999) {
 			maxAllow = 999;
 		}
 		useRotaryEncoder(volumeChoice, 0, maxAllow);
-		char buf[6];
+		char buf[11];
 		sprintf_P(buf, PSTR("Change %+03d%n"), volumeChoice);
 		displayLineLeft(1, buf);
 		break;
@@ -715,8 +718,8 @@ boolean setBoosterDoseMenuItem() {
 				/ (getSchedule(scheduleChoice)->getMaxVolume()
 						- getSchedule(scheduleChoice)->getDailyVolume())) + 1;
 
-		useRotaryEncoder(daysChoice, minDays, 14);
-		char buf[6];
+		useRotaryEncoder(daysChoice, minDays, MAXIMUM_BOOSTER_DAYS);
+		char buf[8];
 		sprintf_P(buf, PSTR("%d Days%n"), daysChoice);
 		displayLineLeft(1, buf);
 		break;

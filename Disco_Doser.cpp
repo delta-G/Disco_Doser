@@ -3,22 +3,22 @@
 #include "Time.h"
 
 
-uint8_t heartbeatPin = A0;
+uint8_t heartbeatPin = HEART_BEAT_PIN;  // I know it is redundant, but I want to be able to assign it with the rest of the pins in DoseHead.h
 uint8_t heartState = 0;
 
 
 void setup() {
 
-	//pinMode(7, OUTPUT); // Need a 5V line for my button and encoder right now. Easier to reach pin 7 than +5V right now.
-	//digitalWrite(7, HIGH); //These first two lines will come out in the final product
+	//pinMode(3, OUTPUT); // Need a 5V line for my button and encoder right now. Easier to reach pin 3 than +5V right now.
+	//digitalWrite(3, HIGH); //These first two lines will come out in the final product
 	pinMode(heartbeatPin, OUTPUT);
 	initLCD();
 	initButton();
 	initEncoder();
-	RTC.begin(9);
+	RTC.begin(RTC_SS_PIN);
 	DoseAlert::setAlertHandler (alertHandler);
-	getSchedule(0)->startupCode(5, EA_ALK_SCHEDULE, "Alk");
-	getSchedule(1)->startupCode(6, EA_CA_SCHEDULE, "Cal");
+	getSchedule(0)->startupCode(ALK_PUMP_PIN, EA_ALK_SCHEDULE, "Alk");
+	getSchedule(1)->startupCode(CAL_PUMP_PIN, EA_CA_SCHEDULE, "Cal");
 //setTime(1388534400);
 	setSyncInterval(60ul * 60ul); // sync once an hour
 	setSyncProvider(RTC.get);

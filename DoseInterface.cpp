@@ -1,7 +1,7 @@
 #include "DoseInterface.h"
 
-const byte intPin = 2;
-const byte bPin = 4;
+//const byte intPin = 2;
+//const byte bPin = 4;
 
 byte intMask;
 byte bMask;
@@ -23,10 +23,10 @@ boolean buttonState = HIGH;
 unsigned int debounceDelay = 50;   // 50ms debounce
 
 void initEncoder() {
-	pinMode(intPin, INPUT_PULLUP);
-	pinMode(bPin, INPUT_PULLUP);
-	bMask = digitalPinToBitMask(bPin);
-	bReg = portInputRegister(digitalPinToPort(bPin));
+	pinMode(ENCODER_INTERRUPT_PIN, INPUT_PULLUP);
+	pinMode(ENCODER_B_PIN, INPUT_PULLUP);
+	bMask = digitalPinToBitMask(ENCODER_B_PIN);
+	bReg = portInputRegister(digitalPinToPort(ENCODER_B_PIN));
 }
 
 void ISR_encoder_handler() {
@@ -34,8 +34,8 @@ void ISR_encoder_handler() {
 	//  I only want one increment or decrement per click
 	//  So we are only looking at one transition
 	//  We're only using the falling edge on the interrupt pin.
-	//  So we know intPin is LOW.
-	//  If bPin is HIGH then they're different so decrement
+	//  So we know ENCODER_INTERRUPT_PIN is LOW.
+	//  If ENCODER_B_PIN is HIGH then they're different so decrement
 	if (*bReg & bMask) {
 		encoderCounter--;
 	} else {

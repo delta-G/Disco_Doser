@@ -3,13 +3,13 @@
 
 extern HardwareSerial Serial;
 
-LiquidCrystal_SPI_8Bit LCD(8, 10);
+LiquidCrystal_SPI_8Bit LCD(LCD_ENABLE_PIN, LCD_SS_PIN);
 
 char lineBuffer[NUM_LCD_ROWS][NUM_LCD_COLS + 1]; // Leave an extra space for terminating null
 
-byte red_pin = A5;
-byte green_pin = A4;
-byte blue_pin = A3;
+//byte red_pin = A5;
+//byte green_pin = A4;
+//byte blue_pin = A3;
 
 color_vars current_color;
 
@@ -18,9 +18,9 @@ int cursorRow;
 int cursorCol;
 
 void initLCD() {
-	pinMode(red_pin, OUTPUT);
-	pinMode(green_pin, OUTPUT);
-	pinMode(blue_pin, OUTPUT);
+	pinMode(LCD_RED, OUTPUT);
+	pinMode(LCD_GREEN, OUTPUT);
+	pinMode(LCD_BLUE, OUTPUT);
 
 #ifdef USING_SERIAL
 	Serial.begin(19200);
@@ -37,9 +37,9 @@ void setColor(color_vars color) {
 }
 
 void doBacklightColor() {
-	digitalWrite(red_pin, (current_color & 1));
-	digitalWrite(green_pin, (current_color & 2));
-	digitalWrite(blue_pin, (current_color & 4));
+	digitalWrite(LCD_RED, (current_color & 1));
+	digitalWrite(LCD_GREEN, (current_color & 2));
+	digitalWrite(LCD_BLUE, (current_color & 4));
 }
 
 void doDisplay() {

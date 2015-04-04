@@ -15,7 +15,7 @@
  * 4 - Encoder B Pin
  * 5 - Alk Pump
  * 6 - Cal Pump
- * 7 -
+ * 7 - Button Pin
  * 8 - LCD Enable Pin
  * 9 - SS for RTC
  * 10 - SS for LCD
@@ -23,8 +23,28 @@
  * 12 - MISO
  * 13 - SCK
  *
+ * A0 - Heart Beat
+ * A1 -
+ * A2 -
+ * A3 - LCD Backlight (Blue)
+ * A4 - LCD Backlight (Green)
+ * A5 - LCD Backlight (Red)
  *
  */
+
+#define ENCODER_INTERRUPT_PIN 2
+#define ENCODER_B_PIN 4
+#define ALK_PUMP_PIN 5
+#define CAL_PUMP_PIN 6
+#define BUTTON_PIN 7
+#define LCD_ENABLE_PIN 8
+#define RTC_SS_PIN 9
+#define LCD_SS_PIN 10
+
+#define HEART_BEAT_PIN A0
+#define LCD_BLUE A3
+#define LCD_GREEN A4
+#define LCD_RED A5
 
 
 /********  EEPROM ADDRESSES  ********/

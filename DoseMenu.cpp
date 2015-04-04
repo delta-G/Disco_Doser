@@ -606,7 +606,7 @@ boolean singleDoseMenuItem() {
 			break;
 		}
 		displayLineLeft(0, F("Choose Volume:"));
-		useRotaryEncoder(volumeChoice, 0, 100, 10);
+		useRotaryEncoder(volumeChoice, 0, MAX_SINGLE_DOSE, SINGLE_DOSE_INCREMENT);
 		char buf[6];
 		sprintf_P(buf, PSTR("%03d%n"), volumeChoice);
 		displayLineLeft(1, buf);
@@ -621,7 +621,7 @@ boolean singleDoseMenuItem() {
 			break;
 		}
 		displayLineLeft(0, F("Choose Volume:"));
-		useRotaryEncoder(volumeChoice, 0, 100);
+		useRotaryEncoder(volumeChoice, 0, MAX_SINGLE_DOSE);
 		char buf[6];
 		sprintf_P(buf, PSTR("%03d%n"), volumeChoice);
 		displayLineLeft(1, buf);
@@ -697,8 +697,8 @@ boolean setBoosterDoseMenuItem() {
 
 		int maxAllow = ((getSchedule(scheduleChoice)->getMaxVolume()
 				- getSchedule(scheduleChoice)->getDailyVolume()) * (MAXIMUM_BOOSTER_DAYS -1));
-		if (maxAllow > 999) {
-			maxAllow = 999;
+		if (maxAllow > MAXIMUM_BOOSTER_DOSE) {
+			maxAllow = MAXIMUM_BOOSTER_DOSE;
 		}
 		useRotaryEncoder(volumeChoice, 0, maxAllow);
 		char buf[11];
@@ -1003,7 +1003,7 @@ boolean adjustMaxVolumeMenuItem() {
 			break;
 		}
 		displayLineLeft(0, F("Choose Volume:"));
-		useRotaryEncoder(volumeChoice, 0, 999);
+		useRotaryEncoder(volumeChoice, 0, MAXIMUM_VOLUME);
 		char buf[6];
 		sprintf_P(buf, PSTR("%03d%n"), volumeChoice);
 		displayLineLeft(1, buf);
@@ -1200,7 +1200,7 @@ boolean enableScheduleMenuItem() {
 	}
 		/* no break */
 	case 4: {
-		if (millis() - prevMillis >= 4000) {
+		if (millis() - prevMillis >= MESSAGE_DISPLAY_TIME) {
 			state = 0;
 			buttonOff();
 			encoderOff();
@@ -1311,7 +1311,7 @@ boolean addToContainerMenuItem() {
 		int roomLeft =
 				getSchedule(scheduleChoice)->getContainer()->getSize()
 						- getSchedule(scheduleChoice)->getContainer()->getCurrentVolume();
-		useRotaryEncoder(volumeChoice, 0, roomLeft, 100);
+		useRotaryEncoder(volumeChoice, 0, roomLeft, CONTAINER_SIZE_STEP);
 		char buf[6];
 		sprintf_P(buf, PSTR("%04d%n"), volumeChoice);
 		displayLineLeft(1, buf);
@@ -1380,7 +1380,7 @@ boolean setContainerVolumeMenuItem() {
 		}
 		displayLineLeft(0, F("Vol in Cont:"));
 		useRotaryEncoder(volumeChoice, 0,
-				getSchedule(scheduleChoice)->getContainer()->getSize(), 100);
+				getSchedule(scheduleChoice)->getContainer()->getSize(), CONTAINER_SIZE_STEP);
 		char buf[6];
 		sprintf_P(buf, PSTR("%04d%n"), volumeChoice);
 		displayLineLeft(1, buf);
@@ -1449,7 +1449,7 @@ boolean setContainerSizeMenuItem() {
 			break;
 		}
 		displayLineLeft(0, F("Container Size:"));
-		useRotaryEncoder(volumeChoice, 0, 9999, 100);
+		useRotaryEncoder(volumeChoice, 0, MAXIMUM_CONTAINER_SIZE, CONTAINER_SIZE_STEP);
 		char buf[6];
 		sprintf_P(buf, PSTR("%04d%n"), volumeChoice);
 		displayLineLeft(1, buf);
@@ -1603,7 +1603,7 @@ boolean calibratePumpMenuItem() {
 			state = 0;
 			return true;
 		}
-		useRotaryEncoder(outputVolume, 0, 999);
+		useRotaryEncoder(outputVolume, 0, MAXIMUM_VOLUME);
 		displayLineLeft(0, F("Enter Volume:"));
 		char buf[NUM_LCD_COLS + 1];
 		sprintf_P(buf, PSTR("%03d%n"), outputVolume);

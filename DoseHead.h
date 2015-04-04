@@ -59,17 +59,27 @@
 /***********  CONSTANTS  ***********/
 #define NUMBER_OF_PUMPS 2
 
+//#define CALIBRATION_TIME 30000ul   //Math requires hard coded value for now (see code)
+
 //#define DEBOUNCE 50
 #define DEFAULT_VOLUME 20.0
 #define DEFAULT_RATE 20.0
 #define MIDNIGHT 1440
 
+#define MAX_SINGLE_DOSE 100
+#define SINGLE_DOSE_INCREMENT 10
+
+#define MAXIMUM_VOLUME 999
+
 #define DEFAULT_MAXIMUM_DAILY_VOLUME 120
 
 #define MAXIMUM_CONTAINER_SIZE 5000
+#define CONTAINER_SIZE_STEP 100
 
 #define MAXIMUM_BOOSTER_DOSE 250
 #define MAXIMUM_BOOSTER_DAYS 14
+
+#define MESSAGE_DISPLAY_TIME 4000
 
 //#define DOSE_DELAY 30000ul
 

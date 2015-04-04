@@ -44,7 +44,7 @@ void DS3234RTC::begin(int _cs_pin)
   cs_pin = _cs_pin;
   pinMode(cs_pin,OUTPUT);
   SPI.setBitOrder(MSBFIRST);
-  SPI.setDataMode(SPI_MODE1); // both mode 1 & 3 should work 
+  //SPI.setDataMode(SPI_MODE1); // both mode 1 & 3 should work
   cs(LOW);
   SPI.transfer(CONTROL_W);
   SPI.transfer(MODE); 
@@ -54,6 +54,11 @@ void DS3234RTC::begin(int _cs_pin)
 
 void DS3234RTC::cs(int _value)
 {
+	if(_value == LOW){
+		SPI.setDataMode(SPI_MODE1);
+	} else {
+		SPI.setDataMode(SPI_MODE0);
+	}
   digitalWrite(cs_pin,_value);
 }
 

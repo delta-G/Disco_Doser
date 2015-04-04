@@ -4,7 +4,27 @@
 
 // uncomment to use Serial for debugging instead of LCD.
 
-#define USING_SERIAL
+//#define USING_SERIAL
+
+/********  PIN ASSIGNMENTS   ********
+ *
+ * 0 -
+ * 1 -
+ * 2 - Encoder Interrupt Pin
+ * 3 -
+ * 4 - Encoder B Pin
+ * 5 - Alk Pump
+ * 6 - Cal Pump
+ * 7 -
+ * 8 - LCD Enable Pin
+ * 9 - SS for RTC
+ * 10 - SS for LCD
+ * 11 - MOSI
+ * 12 - MISO
+ * 13 - SCK
+ *
+ *
+ */
 
 
 /********  EEPROM ADDRESSES  ********/

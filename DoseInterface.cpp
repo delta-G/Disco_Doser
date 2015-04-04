@@ -12,7 +12,7 @@ volatile byte *bReg;
 volatile char encoderCounter;
 boolean encoderIsOn = false;
 
-const byte buttonPin = 3;
+const byte buttonPin = 7;
 boolean buttonPressed = false;
 boolean buttonLongPressed = false;
 boolean killPress = false;

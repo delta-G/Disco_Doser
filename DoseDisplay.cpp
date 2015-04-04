@@ -187,7 +187,7 @@ void doCursor(){
 	Serial.println(cursorCol);
 #else
 	LCD.cursor();
-	LCD.setCursor(acol, arow);
+	LCD.setCursor(cursorCol, cursorRow);
 #endif
 	}
 	else {

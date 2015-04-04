@@ -9,8 +9,8 @@ uint8_t heartState = 0;
 
 void setup() {
 
-	pinMode(7, OUTPUT); // Need a 5V line for my button and encoder right now. Easier to reach pin 7 than +5V right now.
-	digitalWrite(7, HIGH); //These first two lines will come out in the final product
+	//pinMode(7, OUTPUT); // Need a 5V line for my button and encoder right now. Easier to reach pin 7 than +5V right now.
+	//digitalWrite(7, HIGH); //These first two lines will come out in the final product
 	pinMode(heartbeatPin, OUTPUT);
 	initLCD();
 	initButton();

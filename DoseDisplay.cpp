@@ -138,7 +138,7 @@ void displayTextRight(int row, int scol, int col, const __FlashStringHelper* mes
 	if (numSpaces < 0) {
 		numSpaces = 0;
 	}
-	for(int i=scol; i<col; i++) {
+	for(int i=scol; i< scol + col; i++) {
 		if(i < numSpaces) {
 			lineBuffer[row][i] = ' ';
 		}

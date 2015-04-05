@@ -7,10 +7,6 @@ LiquidCrystal_SPI_8Bit LCD(LCD_ENABLE_PIN, LCD_SS_PIN);
 
 char lineBuffer[NUM_LCD_ROWS][NUM_LCD_COLS + 1]; // Leave an extra space for terminating null
 
-//byte red_pin = A5;
-//byte green_pin = A4;
-//byte blue_pin = A3;
-
 color_vars current_color;
 
 boolean cursorActive = false;
@@ -121,7 +117,7 @@ void displayTextRight(int row, int scol, int col, const char* message) {
 	if (numSpaces < 0) {
 		numSpaces = 0;
 	}
-	for (int i = scol; i < col; i++) {
+	for (int i = scol; i < scol + col; i++) {
 		if (i < numSpaces) {
 			lineBuffer[row][i] = ' ';
 		} else {

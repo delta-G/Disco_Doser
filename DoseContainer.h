@@ -4,7 +4,6 @@
 
 #include "Arduino.h"
 #include "DoseAlert.h"
-#include "DoseHead.h"
 
 
 class DoseContainer {

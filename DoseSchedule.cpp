@@ -202,7 +202,7 @@ void DoseSchedule::runSchedule() {
 		pumpTimer();
 	} else if (enabled) {
 		checkTimer();
-	} // end if(enabled)
+	}
 }
 
 
@@ -358,7 +358,7 @@ void DoseSchedule::singleDose(int aVolume) {
 }
 
 void DoseSchedule::saveSchedule(int clr_flag) {
-	// Saves the four user input variables to EEPROM
+	// Saves the user input variables to EEPROM
 
 	byte flag;   // Indicates a saved schedule
 

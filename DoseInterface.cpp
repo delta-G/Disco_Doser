@@ -121,7 +121,7 @@ void pollButton() {
 		if (curState != lastState) {
 			pressTime = millis();
 		}
-		if ((millis() - pressTime) > debounceDelay) {
+		if ((millis() - pressTime) > BUTTON_DEBOUNCE) {
 			if ((buttonState == LOW) && (curState == HIGH)) { // button was pressed and is being released
 				if (!killPress) {   //Prevents registering a press on the release from a long press
 					buttonPressed = true;    // register a button press
@@ -131,7 +131,7 @@ void pollButton() {
 			buttonState = curState;
 		}
 
-		if ((buttonState == LOW) && (millis() - pressTime > 2000)) {
+		if ((buttonState == LOW) && (millis() - pressTime > BUTTON_LONG_PRESS_TIME)) {
 			buttonLongPressed = true;
 			killPress = true;    //  Force to skip next press when button is released after long press
 		}

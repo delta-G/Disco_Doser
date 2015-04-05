@@ -5,7 +5,7 @@
 
 
 DoseContainer::DoseContainer(){
-  containerSize = 4000;
+  containerSize = DEFAULT_CONTAINER_SIZE;
   currentVolume = 0;
 }
 

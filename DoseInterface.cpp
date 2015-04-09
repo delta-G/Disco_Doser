@@ -1,12 +1,11 @@
 #include "DoseInterface.h"
 
+// These are not #defined in DoseHead.  Left here for reference.
 //const byte intPin = 2;
 //const byte bPin = 4;
 
-byte intMask;
 byte bMask;
 
-volatile byte *intReg;
 volatile byte *bReg;
 
 volatile char encoderCounter;

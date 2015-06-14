@@ -9,6 +9,7 @@ void DoseSchedule::turnPumpOn() {
 void DoseSchedule::turnPumpOff() {
 	(pump).pumpOff();
 	pump_is_running = false;
+	priming = false;
 }
 
 void DoseSchedule::runPump(int avol) {
@@ -33,6 +34,10 @@ void DoseSchedule::setEnabled(boolean boo) {
 	}
 }
 
+void DoseSchedule::setPriming(boolean abool) {
+	priming = abool;
+}
+
 DoseSchedule::DoseSchedule() {
 	setName("   ");
 	reset_flag = false;
@@ -43,13 +48,13 @@ DoseSchedule::DoseSchedule() {
 	//rate = DEFAULT_RATE;
 	pump_is_running = false;
 	enabled = false;
+	priming = false;
 	set_volume = 0;
 	pump_run_time = 0;
 	pump_start_time = 0;
 	target_volume = 0;
 	eeprom_location = 0;
 }
-
 
 void DoseSchedule::startupCode(byte apin, int aloc, char* aname) {
 	pump.initPump(apin);
@@ -58,11 +63,11 @@ void DoseSchedule::startupCode(byte apin, int aloc, char* aname) {
 	//name = aname;
 	setName(aname);
 	container.setName(name);
-	if(!getSchedule()){
+	if (!getSchedule()) {
 		setEnabled(false);
 	}
-	if(!getCal()){
-		notCalibratedAlert.setActive(true, 2, name , F("NOT CALIBRATED"));
+	if (!getCal()) {
+		notCalibratedAlert.setActive(true, 2, name, F("NOT CALIBRATED"));
 		setEnabled(false);
 	}
 
@@ -73,7 +78,7 @@ char* DoseSchedule::getName() {
 }
 
 void DoseSchedule::setName(char* aName) {
-	strncpy(name , aName , 3);
+	strncpy(name, aName, 3);
 	name[3] = 0;
 }
 
@@ -112,14 +117,13 @@ TimeOfDay DoseSchedule::getInterval() {
 	return interval;
 }
 
-int DoseSchedule::getMaxVolume(){
+int DoseSchedule::getMaxVolume() {
 	return maxVolume;
 }
 
-void DoseSchedule::setMaxVolume(int aVol){
+void DoseSchedule::setMaxVolume(int aVol) {
 	maxVolume = aVol;
 }
-
 
 DoseContainer* DoseSchedule::getContainer() {
 	return &container;
@@ -181,30 +185,30 @@ void DoseSchedule::initSchedule() {
 	}
 }
 
-
 void DoseSchedule::resetSchedule() {
 	target_volume = set_volume;
 	if (booster_volume > 0)
 		addBooster();   // This is where we pick up the booster
 
-	if(target_volume > maxVolume){
+	if (target_volume > maxVolume) {
 		volExceedAlert.setActive(true, 2, name, F("Max Vol Exceed"));
 	} else {
 		// **TODO
 		// The alert will only last one day.  We might fix this later.
-		volExceedAlert.setActive(false);
-	}
+				volExceedAlert.setActive(false);
+			}
 
-}
+		}
 
 void DoseSchedule::runSchedule() {
-	if (pump_is_running) {
-		pumpTimer();
-	} else if (enabled) {
-		checkTimer();
+	if (!priming) {
+		if (pump_is_running) {
+			pumpTimer();
+		} else if (enabled) {
+			checkTimer();
+		}
 	}
 }
-
 
 boolean DoseSchedule::checkTimer() {
 	TimeOfDay run_time(now());   //  Get the time
@@ -244,7 +248,6 @@ boolean DoseSchedule::checkTimer() {
 boolean DoseSchedule::pumpTimer() {
 	//  TODO
 	//  Change return value to whether pump running at end or not
-
 
 	// Will return true if it turns the pump off
 	// or return false if it leaves it running
@@ -380,11 +383,11 @@ void DoseSchedule::saveSchedule(int clr_flag) {
 		int siz = container.getSize();
 
 		flag |= 4;   // Indicates a saved schedule
-		flag &=~3;   // Indicates a saved schedule
-		if(enabled){
-			flag &=~8;  // clear disabled flag
+		flag &= ~3;   // Indicates a saved schedule
+		if (enabled) {
+			flag &= ~8;  // clear disabled flag
 		} else {
-			flag |=8;
+			flag |= 8;
 		}
 		writeToEEPROM(eeprom_location, st);
 		writeToEEPROM(eeprom_location + 2, et);
@@ -403,7 +406,7 @@ boolean DoseSchedule::getSchedule() {
 	byte flag;
 
 	readFromEEPROM(eeprom_location + 18, flag);
-	if (!((flag & 7) == 4)) {  // 0 and 1 bit cleared and 2 bit set is a good schedule
+	if (!((flag & 7) == 4)) { // 0 and 1 bit cleared and 2 bit set is a good schedule
 		return false;           // It's not a good schedule
 	} else {
 
@@ -446,7 +449,7 @@ void DoseSchedule::saveCal(int clr_flag) {
 
 	else {
 		flag &= ~16;   // Indicates a saved calibration
-		if (PWM_ENABLED){
+		if (PWM_ENABLED) {
 			flag &= ~32;  // Indicates calibrated with PWM on.
 		}
 		writeToEEPROM(eeprom_location + 20, (pump).minimum_pwm_rate);

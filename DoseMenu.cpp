@@ -1508,6 +1508,7 @@ boolean primePumpMenuItem() {
 	case 2: {
 		if (checkButton()) {
 
+			getSchedule(scheduleChoice)->setPriming(true);
 			getSchedule(scheduleChoice)->turnPumpOn();
 			state++;
 			break;

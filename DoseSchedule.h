@@ -21,6 +21,7 @@ private:
   
   
   boolean enabled;
+  boolean priming;
 
   // user input variables
   TimeOfDay start_time;
@@ -81,6 +82,7 @@ private:
   
   void setEnabled(boolean);
   boolean isEnabled();
+  void setPriming(boolean);
   
   void setCalibration(int, int);
   

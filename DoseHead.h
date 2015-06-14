@@ -11,8 +11,8 @@
  * 0 -
  * 1 -
  * 2 - Encoder Interrupt Pin
- * 3 -
- * 4 - Encoder B Pin
+ * 3 - Encoder B Pin  // Moved here because something is wrong with 4 on my SMD board
+ * 4 -
  * 5 - Alk Pump
  * 6 - Cal Pump
  * 7 - Button Pin
@@ -33,7 +33,7 @@
  */
 
 #define ENCODER_INTERRUPT_PIN 2
-#define ENCODER_B_PIN 4
+#define ENCODER_B_PIN 3
 #define ALK_PUMP_PIN 5
 #define CAL_PUMP_PIN 6
 #define BUTTON_PIN 7

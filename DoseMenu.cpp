@@ -1573,6 +1573,7 @@ boolean calibratePumpMenuItem() {
 		if (checkButton()) {
 
 			startedTime = millis();
+			getSchedule(scheduleChoice)->setPriming(true);
 			getSchedule(scheduleChoice)->turnPumpOn();
 			state++;
 			break;

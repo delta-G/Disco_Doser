@@ -11,7 +11,6 @@ volatile byte *bReg;
 volatile char encoderCounter;
 boolean encoderIsOn = false;
 
-const byte buttonPin = 7;
 boolean buttonPressed = false;
 boolean buttonLongPressed = false;
 boolean killPress = false;
@@ -109,14 +108,14 @@ boolean isEncoderOn() {
 }
 
 void initButton() {
-	pinMode(buttonPin, INPUT_PULLUP);
+	pinMode(BUTTON_PIN, INPUT_PULLUP);
 }
 
 void pollButton() {
 	static boolean lastState = HIGH;
 	static unsigned long pressTime = 0;
 	if (buttonIsOn) {
-		boolean curState = digitalRead(buttonPin);
+		boolean curState = digitalRead(BUTTON_PIN);
 		if (curState != lastState) {
 			pressTime = millis();
 		}

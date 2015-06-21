@@ -5,7 +5,9 @@
 // uncomment to use Serial for debugging instead of LCD.
 
 //#define USING_SERIAL
-#define NEW_BOARD
+#define NEW_BOARD   // uses alternate pin assignments for home-brew board.
+
+
 /********  PIN ASSIGNMENTS   ********
  *
  * 0 -

@@ -32,11 +32,23 @@ void setColor(color_vars color) {
 	current_color = color;
 }
 
+#ifdef NEW_BOARD   // New Board reverses the logic for the LCD lights
+
+void doBacklightColor() {
+	digitalWrite(LCD_RED, !(current_color & 1));
+	digitalWrite(LCD_GREEN, !(current_color & 2));
+	digitalWrite(LCD_BLUE, !(current_color & 4));
+}
+
+#else
+
 void doBacklightColor() {
 	digitalWrite(LCD_RED, (current_color & 1));
 	digitalWrite(LCD_GREEN, (current_color & 2));
 	digitalWrite(LCD_BLUE, (current_color & 4));
 }
+
+#endif
 
 void doDisplay() {
 	static unsigned long previousMillis = 0;

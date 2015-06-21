@@ -5,7 +5,7 @@
 // uncomment to use Serial for debugging instead of LCD.
 
 //#define USING_SERIAL
-
+#define NEW_BOARD
 /********  PIN ASSIGNMENTS   ********
  *
  * 0 -
@@ -32,6 +32,24 @@
  *
  */
 
+#ifdef NEW_BOARD
+
+#define ENCODER_INTERRUPT_PIN 2
+#define ENCODER_B_PIN 4
+#define ALK_PUMP_PIN 9
+#define CAL_PUMP_PIN 6
+#define BUTTON_PIN 8
+#define LCD_ENABLE_PIN A3
+#define RTC_SS_PIN 10
+#define LCD_SS_PIN A1
+
+#define HEART_BEAT_PIN A5
+#define LCD_BLUE A0
+#define LCD_GREEN A2
+#define LCD_RED A4
+
+#else
+
 #define ENCODER_INTERRUPT_PIN 2
 #define ENCODER_B_PIN 3
 #define ALK_PUMP_PIN 5
@@ -45,6 +63,8 @@
 #define LCD_BLUE A3
 #define LCD_GREEN A4
 #define LCD_RED A5
+
+#endif
 
 
 /********  EEPROM ADDRESSES  ********/

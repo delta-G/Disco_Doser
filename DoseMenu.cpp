@@ -1550,6 +1550,7 @@ boolean calibratePumpMenuItem() {
 
 	case 0: {
 		buttonOn();
+		encoderOn();
 		scheduleChoice = 0;
 		startedTime = 0;
 		outputVolume = 0;

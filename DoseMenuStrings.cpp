@@ -8,7 +8,7 @@
 const char M1_S1[] PROGMEM = "Set Time";
 const char M1_S2[] PROGMEM = "Schedule";
 const char M1_S3[] PROGMEM = "Single Dose";
-const char M1_S4[] PROGMEM = "Temp Adjustment";
+const char M1_S4[] PROGMEM = "Booster";
 const char M1_S5[] PROGMEM = "Pump";
 const char M1_S6[] PROGMEM = "Container";
 const char M1_S7[] PROGMEM = "Run";

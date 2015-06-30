@@ -11,7 +11,8 @@ const char M1_S3[] PROGMEM = "Single Dose";
 const char M1_S4[] PROGMEM = "Temp Adjustment";
 const char M1_S5[] PROGMEM = "Pump";
 const char M1_S6[] PROGMEM = "Container";
-const char M1_S7[] PROGMEM = "Run";
+const char M1_S7[] PROGMEM = "Set Lockout";
+const char M1_S8[] PROGMEM = "Run";
 
 
 
@@ -52,7 +53,8 @@ const char * const menu_1[] PROGMEM =
   M1_S4,
   M1_S5,
   M1_S6,
-  M1_S7
+  M1_S7,
+  M1_S8
 };
 
 const char * const menu_2[] PROGMEM =

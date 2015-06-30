@@ -263,6 +263,10 @@ void doAlertStateUI() {
 //	}
 //}
 
+
+unsigned long lockout_time_ms = 15UL * 60 * 1000;
+
+
 void runDosers() {
 
 	static boolean lockedout = false;
@@ -273,20 +277,22 @@ void runDosers() {
 		if ((strcmp(getSchedule(i)->getName(), "Cal") == 0)
 				|| (strcmp(getSchedule(i)->getName(), "Alk") == 0)) {
 
-			if (lockedout){
+			if (lockedout) {
 
-				getSchedule(i)->pumpTimer();  // run this anyway just in case a pump is running for some reason.
-				if(getSchedule(i)->isPumpRunning()){
+				getSchedule(i)->pumpTimer(); // run this anyway just in case a pump is running for some reason.
+				if (getSchedule(i)->isPumpRunning()) {
 					lockedSinceMillis = millis();
 				} else {
-					if(millis() - lockedSinceMillis >= LOCKOUT_TIME_MS){
+					if (millis() - lockedSinceMillis >= lockout_time_ms) {
 						lockedout = false;
 					}
 				}
 
 			} else {  // not lockedout
-				if (getSchedule(i)->runSchedule()){  // if this turns on a pump
-					lockedout = true;
+				if (getSchedule(i)->runSchedule()) {  // if this turns on a pump
+					if (lockout_time_ms > 0) {
+						lockedout = true;
+					}
 					lockedSinceMillis = millis();
 				}
 			}

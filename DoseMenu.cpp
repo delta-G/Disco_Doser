@@ -1,6 +1,8 @@
 #include "DoseMenu.h"
 
 
+extern unsigned long lockout_time_ms;
+
 void (*menuFunction)();
 
 Branch_Function menu_Branches[] = { &branch_Base, &branch_Schedule,
@@ -742,6 +744,62 @@ boolean setBoosterDoseMenuItem() {
 	}
 	return false;
 }
+
+
+
+boolean setLockoutTimeMenuItem() {
+
+	static TimeOfDay lockoutTimeChoice(0);
+
+	static int state = 0;
+
+	switch (state) {
+
+	case 0: {
+		encoderOn();
+		buttonOn();
+		lockoutTimeChoice.setTime(lockout_time_ms / 1000);
+		state++;
+	}
+	/* no break */
+
+	case 1: {
+		if (inputTimeOfDay(lockoutTimeChoice)) {
+					state++;
+					break;
+				}
+				displayLineLeft(0, F("Lockout Time:"));
+				char buf[NUM_LCD_COLS + 1];
+				lockoutTimeChoice.printMe(buf);
+				displayLineLeft(1, buf);
+				break;
+
+	}
+
+	case 2: {
+
+		lockout_time_ms = lockoutTimeChoice.getTime() * 1000UL;
+
+
+		state = 0;
+		return true;
+
+	}
+
+
+	}
+
+	if (cancelFlag) {
+			state = 0;
+			encoderOff();
+			buttonOff();
+			return true;
+		}
+
+	return false;
+}
+
+
 
 boolean setScheduleMenuItem() {
 	static int scheduleChoice = 0;

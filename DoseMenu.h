@@ -72,6 +72,7 @@ boolean inputTimeOfDay(TimeOfDay& var);
 boolean setTheTime();
 boolean singleDoseMenuItem();
 boolean setBoosterDoseMenuItem();
+boolean setLockoutTimeMenuItem();
 
 boolean setScheduleMenuItem();
 boolean setScheduleNameMenuItem();

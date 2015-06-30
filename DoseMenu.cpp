@@ -1,6 +1,5 @@
 #include "DoseMenu.h"
 
-
 extern unsigned long lockout_time_ms;
 
 void (*menuFunction)();
@@ -157,6 +156,15 @@ void branch_Base() {
 		current_menu = (CONTAINER_MENU);
 		current_item = 0;
 		menuFunction = doMenu;
+		break;
+	}
+
+	case SET_LOCKOUT: {
+		if (setLockoutTimeMenuItem()) {
+			current_menu = (BASE_MENU);
+			current_item = 0;
+			menuFunction = doMenu;
+		}
 		break;
 	}
 
@@ -608,7 +616,8 @@ boolean singleDoseMenuItem() {
 			break;
 		}
 		displayLineLeft(0, F("Choose Volume:"));
-		useRotaryEncoder(volumeChoice, 0, MAX_SINGLE_DOSE, SINGLE_DOSE_INCREMENT);
+		useRotaryEncoder(volumeChoice, 0, MAX_SINGLE_DOSE,
+				SINGLE_DOSE_INCREMENT);
 		char buf[6];
 		sprintf_P(buf, PSTR("%03d%n"), volumeChoice);
 		displayLineLeft(1, buf);
@@ -698,7 +707,8 @@ boolean setBoosterDoseMenuItem() {
 		//  Fix this to allow for negative numbers
 
 		int maxAllow = ((getSchedule(scheduleChoice)->getMaxVolume()
-				- getSchedule(scheduleChoice)->getDailyVolume()) * (MAXIMUM_BOOSTER_DAYS -1));
+				- getSchedule(scheduleChoice)->getDailyVolume())
+				* (MAXIMUM_BOOSTER_DAYS - 1));
 		if (maxAllow > MAXIMUM_BOOSTER_DOSE) {
 			maxAllow = MAXIMUM_BOOSTER_DOSE;
 		}
@@ -745,8 +755,6 @@ boolean setBoosterDoseMenuItem() {
 	return false;
 }
 
-
-
 boolean setLockoutTimeMenuItem() {
 
 	static TimeOfDay lockoutTimeChoice(0);
@@ -761,18 +769,18 @@ boolean setLockoutTimeMenuItem() {
 		lockoutTimeChoice.setTime(lockout_time_ms / 1000);
 		state++;
 	}
-	/* no break */
+		/* no break */
 
 	case 1: {
 		if (inputTimeOfDay(lockoutTimeChoice)) {
-					state++;
-					break;
-				}
-				displayLineLeft(0, F("Lockout Time:"));
-				char buf[NUM_LCD_COLS + 1];
-				lockoutTimeChoice.printMe(buf);
-				displayLineLeft(1, buf);
-				break;
+			state++;
+			break;
+		}
+		displayLineLeft(0, F("Lockout Time:"));
+		char buf[NUM_LCD_COLS + 1];
+		lockoutTimeChoice.printMe(buf);
+		displayLineLeft(1, buf);
+		break;
 
 	}
 
@@ -780,26 +788,22 @@ boolean setLockoutTimeMenuItem() {
 
 		lockout_time_ms = lockoutTimeChoice.getTime() * 1000UL;
 
-
 		state = 0;
 		return true;
 
 	}
 
-
 	}
 
 	if (cancelFlag) {
-			state = 0;
-			encoderOff();
-			buttonOff();
-			return true;
-		}
+		state = 0;
+		encoderOff();
+		buttonOff();
+		return true;
+	}
 
 	return false;
 }
-
-
 
 boolean setScheduleMenuItem() {
 	static int scheduleChoice = 0;
@@ -1251,7 +1255,7 @@ boolean enableScheduleMenuItem() {
 		displayLineLeft(1, choice ? F("->Enable"):F("->Disable"));
 		break;
 	}
-	case 3: {
+	case 3: {  // pump not calibrated
 		prevMillis = millis();
 		state++;
 		// No break, fall through and display
@@ -1438,7 +1442,8 @@ boolean setContainerVolumeMenuItem() {
 		}
 		displayLineLeft(0, F("Vol in Cont:"));
 		useRotaryEncoder(volumeChoice, 0,
-				getSchedule(scheduleChoice)->getContainer()->getSize(), CONTAINER_SIZE_STEP);
+				getSchedule(scheduleChoice)->getContainer()->getSize(),
+				CONTAINER_SIZE_STEP);
 		char buf[6];
 		sprintf_P(buf, PSTR("%04d%n"), volumeChoice);
 		displayLineLeft(1, buf);
@@ -1507,7 +1512,8 @@ boolean setContainerSizeMenuItem() {
 			break;
 		}
 		displayLineLeft(0, F("Container Size:"));
-		useRotaryEncoder(volumeChoice, 0, MAXIMUM_CONTAINER_SIZE, CONTAINER_SIZE_STEP);
+		useRotaryEncoder(volumeChoice, 0, MAXIMUM_CONTAINER_SIZE,
+				CONTAINER_SIZE_STEP);
 		char buf[6];
 		sprintf_P(buf, PSTR("%04d%n"), volumeChoice);
 		displayLineLeft(1, buf);
@@ -1677,30 +1683,30 @@ boolean calibratePumpMenuItem() {
 	return false;
 }
 /*
-boolean pwmSelectMenuItem() {
+ boolean pwmSelectMenuItem() {
 
-	static int state = 0;
-	static unsigned long startTime = 0;
+ static int state = 0;
+ static unsigned long startTime = 0;
 
-	switch (state) {
+ switch (state) {
 
-	case 0: {
-		startTime = millis();
-		state++;
-		// no break, go ahead and fall through to state 1.
-	}
-	case 1: {
-		if (millis() - startTime >= 2000) {
-			state = 0;
-			return true;
-		}
-		displayLineLeft(0, F("PWM not"));
-		displayLineLeft(1, F("Implemented"));
-		break;
-	}
+ case 0: {
+ startTime = millis();
+ state++;
+ // no break, go ahead and fall through to state 1.
+ }
+ case 1: {
+ if (millis() - startTime >= 2000) {
+ state = 0;
+ return true;
+ }
+ displayLineLeft(0, F("PWM not"));
+ displayLineLeft(1, F("Implemented"));
+ break;
+ }
 
-	}  // end switch (state)
-	return false;
-}
+ }  // end switch (state)
+ return false;
+ }
 
-*/
+ */

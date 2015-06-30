@@ -257,12 +257,6 @@ void doAlertStateUI() {
 	}  //end switch (alertState)
 }
 
-//void runDosers() {
-//	for (int i = 0; i < NUMBER_OF_PUMPS; i++) {
-//		getSchedule(i)->runSchedule();
-//	}
-//}
-
 
 unsigned long lockout_time_ms = 15UL * 60 * 1000;
 

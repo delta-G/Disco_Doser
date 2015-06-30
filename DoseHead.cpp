@@ -257,36 +257,43 @@ void doAlertStateUI() {
 	}  //end switch (alertState)
 }
 
-void runDosers() {
-	for (int i = 0; i < NUMBER_OF_PUMPS; i++) {
-		getSchedule(i)->runSchedule();
-	}
-}
+//void runDosers() {
+//	for (int i = 0; i < NUMBER_OF_PUMPS; i++) {
+//		getSchedule(i)->runSchedule();
+//	}
+//}
 
-void runDosersII() {
+void runDosers() {
 
 	static boolean lockedout = false;
+	static unsigned long lockedSinceMillis;
 
 	for (int i = 0; i < NUMBER_OF_PUMPS; i++) {
 
-		if ((strcmp(getSchedule(i)->name, "Cal") == 0)
-				|| (strcmp(getSchedule(i)->name, "Alk") == 0)) {
+		if ((strcmp(getSchedule(i)->getName(), "Cal") == 0)
+				|| (strcmp(getSchedule(i)->getName(), "Alk") == 0)) {
 
-			if (lockedout) {
-				if (getSchedule(i)->pumpTimer()) {
-					lockedout = false;
-				}
-			} else {
-				if (!(getSchedule(i)->pump_is_running)
-						&& getSchedule(i)->checkTimer()) {
-					lockedout = true;
+			if (lockedout){
+
+				getSchedule(i)->pumpTimer();  // run this anyway just in case a pump is running for some reason.
+				if(getSchedule(i)->isPumpRunning()){
+					lockedSinceMillis = millis();
 				} else {
-					getSchedule(i)->pumpTimer();
+					if(millis() - lockedSinceMillis >= LOCKOUT_TIME_MS){
+						lockedout = false;
+					}
+				}
+
+			} else {  // not lockedout
+				if (getSchedule(i)->runSchedule()){  // if this turns on a pump
+					lockedout = true;
+					lockedSinceMillis = millis();
 				}
 			}
+
 		}
 
-		else {
+		else {  // not cal or alk schedules
 			getSchedule(i)->runSchedule();
 		}
 	}

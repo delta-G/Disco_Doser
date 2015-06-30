@@ -251,6 +251,7 @@ boolean DoseSchedule::checkTimer() {
 boolean DoseSchedule::pumpTimer() {
 	//  TODO
 	//  Change return value to whether pump running at end or not
+	//  runDosers now uses this return value.  Don't change it.
 
 	// Will return true if it turns the pump off
 	// or return false if it leaves it running

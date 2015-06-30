@@ -89,7 +89,7 @@ private:
   DoseContainer* getContainer();
   
   void resetSchedule();
-  void runSchedule();
+  boolean runSchedule();
   void initSchedule();
   void listSchedule();
   boolean pumpTimer();

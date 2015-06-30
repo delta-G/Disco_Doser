@@ -200,14 +200,17 @@ void DoseSchedule::resetSchedule() {
 
 		}
 
-void DoseSchedule::runSchedule() {
+// return true if the pump is running at the end.
+boolean DoseSchedule::runSchedule() {
 	if (!priming) {
 		if (pump_is_running) {
-			pumpTimer();
+			return !pumpTimer(); // pumpTimer will return true if it turns off the pump (if the pump is running this works)
 		} else if (enabled) {
-			checkTimer();
+			return checkTimer();  // will return true if it turns the pump on.
 		}
 	}
+	return false; // either we are priming or the pump is not running and the schedule is not enabled.
+
 }
 
 boolean DoseSchedule::checkTimer() {

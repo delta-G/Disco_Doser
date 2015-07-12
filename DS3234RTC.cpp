@@ -25,6 +25,12 @@
 #include "SPI.h"
 #include "DS3234RTC.h"
 
+#define SRAM_ADDRESS_R 0x18
+#define SRAM_ADDRESS_W 0x98
+
+#define SRAM_DATA_R 0x19
+#define SRAM_DATA_W 0x99
+
 const int CONTROL_R = 0x0e;
 const int CONTROL_W = 0x8e;
 const int CONTROL_STATUS_R = 0x0f;
@@ -44,7 +50,7 @@ void DS3234RTC::begin(int _cs_pin)
   cs_pin = _cs_pin;
   pinMode(cs_pin,OUTPUT);
   SPI.setBitOrder(MSBFIRST);
-  //SPI.setDataMode(SPI_MODE1); // both mode 1 & 3 should work
+  //SPI.setDataMode(SPI_MODE1); // both mode 1 & 3 should work  // This now gets done in the cs method
   cs(LOW);
   SPI.transfer(CONTROL_W);
   SPI.transfer(MODE); 
@@ -118,6 +124,60 @@ void DS3234RTC::read( tmElements_t &tm)
   tm.Year = y2kYearToTm((bcd2dec(SPI.transfer(-1))));
   cs(HIGH);
 }
+
+
+
+//   **TODO
+//   Add a function to read or write a block to SRAM
+//   Similar to what we have for the EEPROM
+
+//   Have to add it in the Header since we use a template
+
+
+int DS3234RTC::writeToSRAM(uint8_t address , uint8_t* data, int size){
+
+	cs(LOW);
+	SPI.transfer(SRAM_ADDRESS_W);
+	SPI.transfer(address);
+	cs(HIGH);
+
+	delayMicroseconds(2);
+
+	cs(LOW);
+	SPI.transfer(SRAM_DATA_W);
+
+	for(uint8_t i = 0; i < size; i++){
+		SPI.transfer(data[i]);
+	}
+
+	cs(HIGH);
+
+	return size;
+
+}
+
+int DS3234RTC::readFromSRAM(uint8_t address , uint8_t* data, int size){
+
+	cs(LOW);
+	SPI.transfer(SRAM_ADDRESS_W);
+	SPI.transfer(address);
+	cs(HIGH);
+
+	delayMicroseconds(2);
+
+	cs(LOW);
+	SPI.transfer(SRAM_DATA_R);
+
+	for(uint8_t i = 0; i < size; i++){
+		data[i] = SPI.transfer(-1);
+	}
+
+	cs(HIGH);
+
+	return size;
+
+}
+
 
 // PRIVATE FUNCTIONS
 

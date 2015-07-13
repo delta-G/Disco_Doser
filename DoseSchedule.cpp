@@ -17,6 +17,7 @@ void DoseSchedule::runPump(int avol) {
 	pump_run_time = ((pump).startDosingPump(avol));
 	pump_is_running = true;
 	container.take(avol);
+	saveState();
 }
 
 boolean DoseSchedule::isPumpRunning() {
@@ -144,11 +145,13 @@ void DoseSchedule::setSchedule(TimeOfDay st, TimeOfDay en, TimeOfDay inter,
 						% MIDNIGHT);
 	}
 
+	clearState();
 	initSchedule(); // initialize other variables in schedule to current point in time
 
 }
 
 void DoseSchedule::initSchedule() {
+
 	volume_dosed = 0;  // reset for next calculation
 
 	reset_flag = false;
@@ -164,6 +167,11 @@ void DoseSchedule::initSchedule() {
 	TimeOfDay init_time(now());
 
 	if (isInRange(init_time)) {
+
+		if (getState()) {
+			return;  // If we have a good state saved, use that.
+		}
+
 		int set_point = (TimeOfDay::lengthOfTime(start_time, init_time)
 				% MIDNIGHT);
 
@@ -183,12 +191,15 @@ void DoseSchedule::initSchedule() {
 		reset_flag = true;
 		last_time = end_time;
 	}
+
+	saveState();
 }
 
 void DoseSchedule::resetSchedule() {
 	target_volume = set_volume;
-	if (booster_volume > 0)
+	if (booster_volume > 0) {
 		addBooster();   // This is where we pick up the booster
+	}
 
 	if (target_volume > maxVolume) {
 		volExceedAlert.setActive(true, 2, name, F("Max Vol Exceed"));
@@ -430,7 +441,7 @@ boolean DoseSchedule::getSchedule() {
 
 		setEnabled(!(flag & 8));
 
-		initSchedule(); //  Reset the variables and simulate the last dose point.
+		initSchedule(); //  Reset the variables and simulate the last dose point or read saved state.
 
 		return true;
 	}
@@ -490,3 +501,71 @@ int DoseSchedule::isCal() {
 	}
 }
 
+void DoseSchedule::clearState() {
+	int addr = eeprom_location;
+	int badFlag = 0;
+	writeRTC_SRAM(addr, badFlag);
+}
+
+
+void DoseSchedule::saveState() {
+
+	unsigned long currentTime = now();
+
+	int goodFlag = 123;
+
+	int addr = eeprom_location;
+
+	addr += writeRTC_SRAM(addr, goodFlag);
+	addr += writeRTC_SRAM(addr, currentTime);
+
+	int cv = getContainer()->getCurrentVolume();
+	addr += writeRTC_SRAM(addr, cv);
+
+	int lt = last_time.getTime();
+	addr += writeRTC_SRAM(addr, lt);
+
+	addr += writeRTC_SRAM(addr, volume_dosed);
+	addr += writeRTC_SRAM(addr, target_volume);
+	addr += writeRTC_SRAM(addr, booster_volume);
+	addr += writeRTC_SRAM(addr, booster_days);
+
+}
+
+boolean DoseSchedule::getState() {
+
+	int addr = eeprom_location;
+	int goodFlag = 0;
+	addr += readRTC_SRAM(addr, goodFlag);
+
+	if (goodFlag != 123) {
+		return false;
+	}
+	unsigned long currentTime = now();
+	unsigned long savedTime = 0;
+	addr += readRTC_SRAM(addr, savedTime);
+	//TimeOfDay saveTOD(savedTime);
+	//int timeRemain = TimeOfDay::lengthOfTime( saveTOD, end_time);  // in minutes
+
+	int cv;
+	addr += readRTC_SRAM(addr, cv);
+	getContainer()->setCurrentVolume(cv);
+
+	if (currentTime - savedTime
+			>= (TimeOfDay::lengthOfTime(TimeOfDay(savedTime), end_time) * 60ul
+					* 1000ul)) {
+		return false;   // state is too old, a reset should have occurred.
+	}
+
+	int lt;
+	addr += readRTC_SRAM(addr, lt);
+	last_time.setTime(lt);
+
+	addr += readRTC_SRAM(addr, volume_dosed);
+	addr += readRTC_SRAM(addr, target_volume);
+	addr += readRTC_SRAM(addr, booster_volume);
+	addr += readRTC_SRAM(addr, booster_days);
+
+	return true;
+
+}

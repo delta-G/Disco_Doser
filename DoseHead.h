@@ -74,8 +74,8 @@
 #define EA_CALIBRATION_FLAGS 16
 #define EA_ALK_PUMP 18
 #define EA_CA_PUMP 28
-#define EA_ALK_SCHEDULE 50
-#define EA_CA_SCHEDULE 80
+#define EA_ALK_SCHEDULE 50  // also serving as SRAM address for state variables
+#define EA_CA_SCHEDULE 80   // also serving as SRAM address for state variables
 
 
 /***********  CONSTANTS  ***********/

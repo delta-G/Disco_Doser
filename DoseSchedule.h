@@ -8,6 +8,7 @@
 #include "EepromFuncs.h"
 #include "DoseContainer.h"
 #include "DoseAlert.h"
+#include "DS3234RTC.h"
 
 #define PWM_ENABLED false
 
@@ -102,6 +103,10 @@ private:
     
   
   void singleDose(int);
+
+  void saveState();
+  boolean getState();
+  void clearState();
 
   void saveSchedule(int cl = 1);
   boolean getSchedule();

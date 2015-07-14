@@ -20,6 +20,8 @@ class DosingPump{
         DosingPump(byte pump_pin);
 	    DosingPump();
         void initPump(byte);
+        void setPwmRate(uint8_t);
+        uint8_t getPwmRate();
 
         unsigned long startDosingPump(unsigned int volume);
         void pumpOn();

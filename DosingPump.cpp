@@ -18,6 +18,14 @@ void DosingPump::initPump(byte pin_number) {
 	pinMode(pump_pin, OUTPUT);
 }
 
+void DosingPump::setPwmRate(uint8_t aRate){
+	pwm_rate = aRate;
+}
+
+uint8_t DosingPump::getPwmRate(){
+	return pwm_rate;
+}
+
 //nonblocking function, turns pump on and returns the lenght of time in ms that it should run
 
 

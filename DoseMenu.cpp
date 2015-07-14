@@ -1,6 +1,5 @@
 #include "DoseMenu.h"
 
-
 void (*menuFunction)();
 
 Branch_Function menu_Branches[] = { &branch_Base, &branch_Schedule,
@@ -606,7 +605,8 @@ boolean singleDoseMenuItem() {
 			break;
 		}
 		displayLineLeft(0, F("Choose Volume:"));
-		useRotaryEncoder(volumeChoice, 0, MAX_SINGLE_DOSE, SINGLE_DOSE_INCREMENT);
+		useRotaryEncoder(volumeChoice, 0, MAX_SINGLE_DOSE,
+				SINGLE_DOSE_INCREMENT);
 		char buf[6];
 		sprintf_P(buf, PSTR("%03d%n"), volumeChoice);
 		displayLineLeft(1, buf);
@@ -696,7 +696,8 @@ boolean setBoosterDoseMenuItem() {
 		//  Fix this to allow for negative numbers
 
 		int maxAllow = ((getSchedule(scheduleChoice)->getMaxVolume()
-				- getSchedule(scheduleChoice)->getDailyVolume()) * (MAXIMUM_BOOSTER_DAYS -1));
+				- getSchedule(scheduleChoice)->getDailyVolume())
+				* (MAXIMUM_BOOSTER_DAYS - 1));
 		if (maxAllow > MAXIMUM_BOOSTER_DOSE) {
 			maxAllow = MAXIMUM_BOOSTER_DOSE;
 		}
@@ -1380,7 +1381,8 @@ boolean setContainerVolumeMenuItem() {
 		}
 		displayLineLeft(0, F("Vol in Cont:"));
 		useRotaryEncoder(volumeChoice, 0,
-				getSchedule(scheduleChoice)->getContainer()->getSize(), CONTAINER_SIZE_STEP);
+				getSchedule(scheduleChoice)->getContainer()->getSize(),
+				CONTAINER_SIZE_STEP);
 		char buf[6];
 		sprintf_P(buf, PSTR("%04d%n"), volumeChoice);
 		displayLineLeft(1, buf);
@@ -1449,7 +1451,8 @@ boolean setContainerSizeMenuItem() {
 			break;
 		}
 		displayLineLeft(0, F("Container Size:"));
-		useRotaryEncoder(volumeChoice, 0, MAXIMUM_CONTAINER_SIZE, CONTAINER_SIZE_STEP);
+		useRotaryEncoder(volumeChoice, 0, MAXIMUM_CONTAINER_SIZE,
+				CONTAINER_SIZE_STEP);
 		char buf[6];
 		sprintf_P(buf, PSTR("%04d%n"), volumeChoice);
 		displayLineLeft(1, buf);
@@ -1599,8 +1602,7 @@ boolean calibratePumpMenuItem() {
 
 	case 4: {
 		if (checkButton()) {
-			getSchedule(scheduleChoice)->setCalibration(outputVolume * 2,
-					outputVolume * 2);
+			getSchedule(scheduleChoice)->setCalibration(outputVolume * 2);
 			encoderOff();
 			buttonOff();
 			state = 0;
@@ -1619,30 +1621,105 @@ boolean calibratePumpMenuItem() {
 	return false;
 }
 /*
-boolean pwmSelectMenuItem() {
+ boolean pwmSelectMenuItem() {
 
+ static int state = 0;
+ static unsigned long startTime = 0;
+
+ switch (state) {
+
+ case 0: {
+ startTime = millis();
+ state++;
+ // no break, go ahead and fall through to state 1.
+ }
+ case 1: {
+ if (millis() - startTime >= 2000) {
+ state = 0;
+ return true;
+ }
+ displayLineLeft(0, F("PWM not"));
+ displayLineLeft(1, F("Implemented"));
+ break;
+ }
+
+ }  // end switch (state)
+ return false;
+ }
+
+ */
+
+boolean calibratePwmMenuItem() {
+
+	static int scheduleChoice = 0;
 	static int state = 0;
-	static unsigned long startTime = 0;
+
+	static uint8_t pwmSetPoint = 0;
 
 	switch (state) {
 
 	case 0: {
-		startTime = millis();
+		buttonOn();
+		encoderOn();
+		scheduleChoice = 0;
 		state++;
-		// no break, go ahead and fall through to state 1.
+		break;
 	}
-	case 1: {
-		if (millis() - startTime >= 2000) {
+	case 1: {  //  Choose a pump
+
+		if (checkButton()) {
+			state++;
+			pwmSetPoint = getSchedule(scheduleChoice)->pump.getPwmRate();
+			break;
+		}
+		useRotaryEncoder(scheduleChoice, 0, NUMBER_OF_PUMPS - 1);
+		displayLineLeft(0, F("Choose Pump:"));
+		displayLineLeft(1, getSchedule(scheduleChoice)->getName());
+		break;
+	}
+	case 2: {
+		if (checkButton()) {
+			getSchedule(scheduleChoice)->setPriming(true);
+			getSchedule(scheduleChoice)->turnPumpOn();
+			state++;
+			break;
+		}
+		displayLineLeft(0, F("Press to start:"));
+		displayLineLeft(1, getSchedule(scheduleChoice)->getName());
+		break;
+	}
+	case 3: {
+		if (checkButton()) {
+			getSchedule(scheduleChoice)->turnPumpOff();
+			if (pwmSetPoint != getSchedule(scheduleChoice)->pump.getPwmRate()) {
+				getSchedule(scheduleChoice)->pump.setPwmRate(pwmSetPoint);
+				getSchedule(scheduleChoice)->saveCal(0);
+			}
+			encoderOff();
+			buttonOff();
+			scheduleChoice = 0;
 			state = 0;
 			return true;
 		}
-		displayLineLeft(0, F("PWM not"));
-		displayLineLeft(1, F("Implemented"));
+		useRotaryEncoder(pwmSetPoint, (byte) 0, (byte) 255);
+		displayLineLeft(0, F("Press to Set:"));
+		char buf[NUM_LCD_COLS + 1];
+		sprintf_P(buf, PSTR("PWM = %03d%n"), pwmSetPoint);
+		displayLineLeft(1, buf);
 		break;
 	}
 
-	}  // end switch (state)
-	return false;
-}
+		// What to do about the pump?   IS it on or off?  Have we even chosen a schedule yet?
+	    //  No cancel can be allowed without a flag of some sort.
+//	if (cancelFlag) {
+//			state = 0;
+//			encoderOff();
+//			buttonOff();
+//			return true;
+//		}
 
-*/
+	}  // end switch (state)
+
+	return false;
+
+}

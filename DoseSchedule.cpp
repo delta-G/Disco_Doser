@@ -98,6 +98,22 @@ void DoseSchedule::setCalibration(int mini, int maxi) {
 	notCalibratedAlert.setActive(false);
 }
 
+int DoseSchedule::getVolumeDosed(){
+	return volume_dosed;
+}
+
+int DoseSchedule::getTargetVolume(){
+	return target_volume;
+}
+
+int DoseSchedule::getBoosterVolume(){
+	return booster_volume;
+}
+int DoseSchedule::getBoosterDays(){
+	return booster_days;
+}
+
+
 unsigned long DoseSchedule::getPumpStartTime() {
 	return pump_start_time;
 }
@@ -146,6 +162,7 @@ void DoseSchedule::setSchedule(TimeOfDay st, TimeOfDay en, TimeOfDay inter,
 	}
 
 	clearState();
+	saveSchedule();
 	initSchedule(); // initialize other variables in schedule to current point in time
 
 }
@@ -507,7 +524,6 @@ void DoseSchedule::clearState() {
 	writeRTC_SRAM(addr, badFlag);
 }
 
-
 void DoseSchedule::saveState() {
 
 	unsigned long currentTime = now();
@@ -552,8 +568,7 @@ boolean DoseSchedule::getState() {
 	getContainer()->setCurrentVolume(cv);
 
 	if (currentTime - savedTime
-			>= (TimeOfDay::lengthOfTime(TimeOfDay(savedTime), end_time) * 60ul
-					* 1000ul)) {
+			>= (TimeOfDay::lengthOfTime(TimeOfDay(savedTime), end_time) * 60ul)) {
 		return false;   // state is too old, a reset should have occurred.
 	}
 

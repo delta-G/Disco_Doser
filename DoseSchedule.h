@@ -80,6 +80,10 @@ private:
   int getMaxVolume();
   void setMaxVolume(int);
   void setName(char*);
+  int getVolumeDosed();
+  int getTargetVolume();
+  int getBoosterVolume();
+  int getBoosterDays();
   
   void setEnabled(boolean);
   boolean isEnabled();

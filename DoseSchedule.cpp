@@ -128,6 +128,10 @@ DoseContainer* DoseSchedule::getContainer() {
 	return &container;
 }
 
+DosingPump* DoseSchedule::getPump(){
+	return &pump;
+}
+
 void DoseSchedule::setSchedule(TimeOfDay st, TimeOfDay en, TimeOfDay inter,
 		int vol) {
 	start_time = st;

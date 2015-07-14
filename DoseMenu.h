@@ -88,6 +88,7 @@ boolean setContainerSizeMenuItem();
 
 boolean primePumpMenuItem();
 boolean calibratePumpMenuItem();
+boolean calibratePwmMenuItem();
 boolean pwmSelectMenuItem();
 
 

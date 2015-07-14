@@ -79,6 +79,7 @@ private:
   int getMaxVolume();
   void setMaxVolume(int);
   void setName(char*);
+  DosingPump* getPump();
   
   void setEnabled(boolean);
   boolean isEnabled();

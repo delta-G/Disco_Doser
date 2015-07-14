@@ -20,8 +20,10 @@ void DosingPump::initPump(byte pin_number) {
 
 //nonblocking function, turns pump on and returns the lenght of time in ms that it should run
 
+
 unsigned long DosingPump::startDosingPump(unsigned int volume) {
-	unsigned long flow_time_ms = (volume * 60 * 1000) / flow_rate;
+
+	unsigned long flow_time_ms = (volume * 60ul * 1000ul) / maximum_flow_rate;
 
 	pumpOn();
 	return (flow_time_ms);

@@ -33,7 +33,7 @@ int DosingPump::rateToPWM(int rate) {
 void DosingPump::runDosingPump(unsigned int volume, int rate) {
 
 	int flow_rate = constrain (rate, minimum_flow_rate, maximum_flow_rate);
-	unsigned long flow_time_ms = (volume / flow_rate) * 60 * 1000;
+	unsigned long flow_time_ms = (volume / flow_rate) * 60ul * 1000ul;
 
 	unsigned long start_time = millis();
 	analogWrite(pump_pin, rateToPWM(flow_rate));
@@ -46,14 +46,14 @@ void DosingPump::runDosingPump(unsigned int volume, int rate) {
 unsigned long DosingPump::startDosingPump(unsigned int volume, int rate) {
 
 	int flow_rate = constrain (rate, minimum_flow_rate, maximum_flow_rate);
-	unsigned long flow_time_ms = (volume * 60 * 1000) / flow_rate;
+	unsigned long flow_time_ms = (volume * 60ul * 1000ul) / flow_rate;
 
 	analogWrite(pump_pin, rateToPWM(flow_rate));
 	return (flow_time_ms);
 }
 
 unsigned long DosingPump::startDosingPump(unsigned int volume) {
-	unsigned long flow_time_ms = (volume * 60 * 1000) / maximum_flow_rate;
+	unsigned long flow_time_ms = (volume * 60ul * 1000ul) / maximum_flow_rate;
 
 	digitalWrite(pump_pin, HIGH);
 	return (flow_time_ms);

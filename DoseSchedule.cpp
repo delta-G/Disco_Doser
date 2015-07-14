@@ -149,7 +149,6 @@ void DoseSchedule::setSchedule(TimeOfDay st, TimeOfDay en, TimeOfDay inter,
 }
 
 void DoseSchedule::initSchedule() {
-	volume_dosed = 0;  // reset for next calculation
 
 	reset_flag = false;
 
@@ -179,26 +178,36 @@ void DoseSchedule::initSchedule() {
 	} else {
 		// Normal reset can handle it with the first dose if we're outside the window now
 		// Just set up what it needs
-		volume_dosed = 0;
+		volume_dosed = target_volume;
 		reset_flag = true;
 		last_time = end_time;
 	}
 }
 
 void DoseSchedule::resetSchedule() {
-	target_volume = set_volume;
-	if (booster_volume > 0)
-		addBooster();   // This is where we pick up the booster
 
+	int remain = target_volume - volume_dosed;  // left over from previous day
+
+	volume_dosed = 0;   // reset tally
+	target_volume = set_volume + remain;
+	if (booster_volume > 0) {
+		addBooster();   // This is where we pick up the booster
+	}
 	if (target_volume > maxVolume) {
 		volExceedAlert.setActive(true, 2, name, F("Max Vol Exceed"));
 	} else {
+		volExceedAlert.setActive(false);
 		// **TODO
 		// The alert will only last one day.  We might fix this later.
-				volExceedAlert.setActive(false);
 			}
 
-		}
+	int numDos = (TimeOfDay::lengthOfTime(start_time, end_time)
+			/ interval.getTime()) + 1;
+	if ((target_volume / numDos) >= MAX_SINGLE_DOSE) {
+		volExceedAlert.setActive(true, 2, name, F("Doses too large"));
+	}
+
+}
 
 void DoseSchedule::runSchedule() {
 	if (!priming) {
@@ -214,7 +223,6 @@ boolean DoseSchedule::checkTimer() {
 	TimeOfDay run_time(now());   //  Get the time
 	// This reset function will run once outside the dosing window
 	if ((!(isInRange(run_time))) && (!reset_flag)) {
-		volume_dosed = 0;  // reset tally
 		reset_flag = true; // let the runner know the next dose is the first dose of the window
 	}
 
@@ -232,14 +240,32 @@ boolean DoseSchedule::checkTimer() {
 			reset_flag = false;
 		}
 
-		int run_volume = calculateVolume(run_time,
+		static int been_called = 0;  // Number of times we've been under the minimum dose in a row.
+
+		//  if been_called > 0, this will keep volume consistent by calculating the dose originally and
+		//  multiplying by the number of intervals that have passed without dosing due to small doses.
+		int run_volume = calculateVolume(run_time - (interval.getTime() * been_called),
 				(target_volume - volume_dosed));  // get the volume
 
-		volume_dosed += run_volume;  // update the tally
-		last_time = run_time;   // set last_time to the current time
+		// if tiny doses are accumulating this takes care of them
+		//  and keeps us on a regular schedule
+		run_volume = run_volume * (been_called +1);
 
-		runPump(run_volume);
-		return true;
+		if (run_volume > MAX_SINGLE_DOSE) {
+			run_volume = MAX_SINGLE_DOSE;
+		}
+
+		if (run_volume >= MIN_SINGLE_DOSE) {
+
+			volume_dosed += run_volume;  // update the tally
+			last_time = run_time;   // set last_time to the current time
+			been_called = 0;
+
+			runPump(run_volume);
+			return true;
+		} else {
+			been_called++;   // dose was too small to make
+		}
 	}
 
 	return false;

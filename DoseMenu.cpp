@@ -346,16 +346,14 @@ void branch_Pump() {
 
 	}
 
-		/*
-		 case PWM_SELECT: {
-		 if (pwmSelectMenuItem()) {
-		 current_menu = (PUMP_MENU);
-		 current_item = 0;
-		 menuFunction = doMenu;
-		 }
-		 break;
-		 }
-		 */
+	case CALIBRATE_PWM: {
+		if (calibratePwmMenuItem()) {
+			current_menu = (PUMP_MENU);
+			current_item = 0;
+			menuFunction = doMenu;
+		}
+		break;
+	}
 
 	case EXIT_PUMP_MENU: {
 		current_menu = BASE_MENU;
@@ -1710,7 +1708,7 @@ boolean calibratePwmMenuItem() {
 	}
 
 		// What to do about the pump?   IS it on or off?  Have we even chosen a schedule yet?
-	    //  No cancel can be allowed without a flag of some sort.
+		//  No cancel can be allowed without a flag of some sort.
 //	if (cancelFlag) {
 //			state = 0;
 //			encoderOff();

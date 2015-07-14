@@ -90,9 +90,8 @@ int DoseSchedule::getDailyVolume() {
 	return set_volume;
 }
 
-void DoseSchedule::setCalibration(int mini, int maxi) {
-	pump.minimum_flow_rate = mini;
-	pump.maximum_flow_rate = maxi;
+void DoseSchedule::setCalibration(int aRate) {
+	pump.flow_rate = aRate;
 	saveCal(1);
 	notCalibratedAlert.setActive(false);
 }
@@ -452,9 +451,8 @@ void DoseSchedule::saveCal(int clr_flag) {
 		if (PWM_ENABLED) {
 			flag &= ~32;  // Indicates calibrated with PWM on.
 		}
-		writeToEEPROM(eeprom_location + 20, (pump).minimum_pwm_rate);
-		writeToEEPROM(eeprom_location + 20 + 2, (pump).minimum_flow_rate);
-		writeToEEPROM(eeprom_location + 20 + 6, (pump).maximum_flow_rate);
+		writeToEEPROM(eeprom_location + 20, (pump).pwm_rate);
+		writeToEEPROM(eeprom_location + 20 + 2, (pump).flow_rate);
 		writeToEEPROM(eeprom_location + 18, flag);
 	}
 }
@@ -467,9 +465,8 @@ boolean DoseSchedule::getCal() {
 	if (flag & 16) {
 		return false;    // Not Calibrated Flag is set
 	} else {
-		readFromEEPROM(eeprom_location + 20, (pump).minimum_pwm_rate);
-		readFromEEPROM(eeprom_location + 20 + 2, (pump).minimum_flow_rate);
-		readFromEEPROM(eeprom_location + 20 + 6, (pump).maximum_flow_rate);
+		readFromEEPROM(eeprom_location + 20, (pump).pwm_rate);
+		readFromEEPROM(eeprom_location + 20 + 2, (pump).flow_rate);
 
 		return true;
 	}

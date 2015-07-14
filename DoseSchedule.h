@@ -84,7 +84,7 @@ private:
   boolean isEnabled();
   void setPriming(boolean);
   
-  void setCalibration(int, int);
+  void setCalibration(int);
   
   DoseContainer* getContainer();
   

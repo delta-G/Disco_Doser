@@ -23,7 +23,7 @@ void DosingPump::initPump(byte pin_number) {
 
 unsigned long DosingPump::startDosingPump(unsigned int volume) {
 
-	unsigned long flow_time_ms = (volume * 60ul * 1000ul) / maximum_flow_rate;
+	unsigned long flow_time_ms = (volume * 60ul * 1000ul) / flow_rate;
 
 	pumpOn();
 	return (flow_time_ms);

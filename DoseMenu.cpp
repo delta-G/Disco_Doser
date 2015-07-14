@@ -1653,6 +1653,7 @@ boolean calibratePwmMenuItem() {
 	static int state = 0;
 
 	static uint8_t pwmSetPoint = 0;
+	static uint8_t oldSetPoint = 0;
 
 	switch (state) {
 
@@ -1668,6 +1669,7 @@ boolean calibratePwmMenuItem() {
 		if (checkButton()) {
 			state++;
 			pwmSetPoint = getSchedule(scheduleChoice)->getPump()->getPwmRate();
+			oldSetPoint = pwmSetPoint;
 			break;
 		}
 		useRotaryEncoder(scheduleChoice, 0, NUMBER_OF_PUMPS - 1);
@@ -1689,8 +1691,7 @@ boolean calibratePwmMenuItem() {
 	case 3: {
 		if (checkButton()) {
 			getSchedule(scheduleChoice)->turnPumpOff();
-			if (pwmSetPoint != getSchedule(scheduleChoice)->getPump()->getPwmRate()) {
-				getSchedule(scheduleChoice)->getPump()->setPwmRate(pwmSetPoint);
+			if (pwmSetPoint != oldSetPoint) {
 				getSchedule(scheduleChoice)->saveCal(0);
 			}
 			encoderOff();
@@ -1704,6 +1705,8 @@ boolean calibratePwmMenuItem() {
 		char buf[NUM_LCD_COLS + 1];
 		sprintf_P(buf, PSTR("PWM = %03d%n"), pwmSetPoint);
 		displayLineLeft(1, buf);
+		getSchedule(scheduleChoice)->getPump()->setPwmRate(pwmSetPoint);
+		getSchedule(scheduleChoice)->turnPumpOn();
 		break;
 	}
 

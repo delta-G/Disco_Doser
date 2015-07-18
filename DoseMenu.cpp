@@ -1101,7 +1101,6 @@ boolean showScheduleMenuItem() {
 
 }
 
-
 boolean showScheduleStateMenuItem() {
 
 	static int scheduleChoice = 0;
@@ -1129,6 +1128,12 @@ boolean showScheduleStateMenuItem() {
 		break;
 	}
 	case 2: {
+		if (checkButton()) {
+			buttonOff();
+			encoderOff();
+			state = 0;
+			return true;
+		}
 		char bufs[2][NUM_LCD_COLS + 1];
 		sprintf_P(bufs[0], PSTR("%03d dosed of %03d"),
 				getSchedule(scheduleChoice)->getVolumeDosed(),
@@ -1138,26 +1143,14 @@ boolean showScheduleStateMenuItem() {
 				getSchedule(scheduleChoice)->getBoosterDays());
 		displayLineLeft(0, bufs[0]);
 		displayLineLeft(1, bufs[1]);
-		state++;
 		break;
 
-	}
-	case 3: {
-		if (checkButton()) {
-			buttonOff();
-			encoderOff();
-			state = 0;
-			return true;
-		}
 	}
 	} // end switch (state)
 
 	return false;
 
 }
-
-
-
 
 boolean matchScheduleMenuItem() {
 
@@ -1728,7 +1721,7 @@ boolean calibratePwmMenuItem() {
 	static uint8_t pwmSetPoint = 0;
 	static uint8_t oldSetPoint = 0;
 
- switch (state) {
+	switch (state) {
 
 	case 0: {
 		buttonOn();
@@ -1782,19 +1775,17 @@ boolean calibratePwmMenuItem() {
 		getSchedule(scheduleChoice)->turnPumpOn();
 		break;
 	}
- }  // end switch (state)
- return false;
- }
-		// What to do about the pump?   IS it on or off?  Have we even chosen a schedule yet?
-		//  No cancel can be allowed without a flag of some sort.
+	}  // end switch (state)
+	return false;
+}
+// What to do about the pump?   IS it on or off?  Have we even chosen a schedule yet?
+//  No cancel can be allowed without a flag of some sort.
 //	if (cancelFlag) {
 //			state = 0;
 //			encoderOff();
 //			buttonOff();
 //			return true;
 //		}
-
-
 
 boolean showCalibrationMenuItem() {
 

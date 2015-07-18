@@ -26,6 +26,10 @@ uint8_t DosingPump::getPwmRate(){
 	return pwm_rate;
 }
 
+int DosingPump::getFlowRate(){
+	return flow_rate;
+}
+
 //nonblocking function, turns pump on and returns the lenght of time in ms that it should run
 
 

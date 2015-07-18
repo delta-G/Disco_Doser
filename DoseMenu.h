@@ -33,7 +33,7 @@ enum {
 
 
 enum { 
-  PRIME_PUMP , CALIBRATE_PUMP , CALIBRATE_PWM , EXIT_PUMP_MENU };
+  PRIME_PUMP , CALIBRATE_PUMP , CALIBRATE_PWM , SHOW_CALIBRATION , EXIT_PUMP_MENU };
 
 
 
@@ -89,6 +89,7 @@ boolean setContainerSizeMenuItem();
 boolean primePumpMenuItem();
 boolean calibratePumpMenuItem();
 boolean calibratePwmMenuItem();
+boolean showCalibrationMenuItem();
 boolean pwmSelectMenuItem();
 
 

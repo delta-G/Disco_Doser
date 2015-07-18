@@ -1081,7 +1081,6 @@ boolean showScheduleMenuItem() {
 				getSchedule(scheduleChoice)->getInterval().getMinute());
 		displayLineLeft(0, bufs[0]);
 		displayLineLeft(1, bufs[1]);
-		state++;
 		break;
 
 	}
@@ -1774,7 +1773,6 @@ boolean showCalibrationMenuItem() {
 						/ 255));
 		displayLineLeft(0, bufs[0]);
 		displayLineLeft(1, bufs[1]);
-		state++;
 		break;
 
 	}

@@ -80,16 +80,19 @@ private:
   int getMaxVolume();
   void setMaxVolume(int);
   void setName(char*);
+  
   int getVolumeDosed();
   int getTargetVolume();
   int getBoosterVolume();
   int getBoosterDays();
   
+  DosingPump* getPump();
+  
   void setEnabled(boolean);
   boolean isEnabled();
   void setPriming(boolean);
   
-  void setCalibration(int, int);
+  void setCalibration(int);
   
   DoseContainer* getContainer();
   

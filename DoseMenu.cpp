@@ -356,16 +356,23 @@ void branch_Pump() {
 
 	}
 
-		/*
-		 case PWM_SELECT: {
-		 if (pwmSelectMenuItem()) {
-		 current_menu = (PUMP_MENU);
-		 current_item = 0;
-		 menuFunction = doMenu;
-		 }
-		 break;
-		 }
-		 */
+	case CALIBRATE_PWM: {
+		if (calibratePwmMenuItem()) {
+			current_menu = (PUMP_MENU);
+			current_item = 0;
+			menuFunction = doMenu;
+		}
+		break;
+	}
+
+	case SHOW_CALIBRATION: {
+		if (showCalibrationMenuItem()) {
+			current_menu = (PUMP_MENU);
+			current_item = 0;
+			menuFunction = doMenu;
+		}
+		break;
+	}
 
 	case EXIT_PUMP_MENU: {
 		current_menu = BASE_MENU;
@@ -1066,30 +1073,28 @@ boolean showScheduleMenuItem() {
 		break;
 	}
 	case 2: {
-		char bufs[2][NUM_LCD_COLS + 1];
-		sprintf_P(bufs[0], PSTR("%02d:%02d to %02d:%02d"),
-				getSchedule(scheduleChoice)->getStartTime().getHour(),
-				getSchedule(scheduleChoice)->getStartTime().getMinute(),
-				getSchedule(scheduleChoice)->getEndTime().getHour(),
-				getSchedule(scheduleChoice)->getEndTime().getMinute());
-		sprintf_P(bufs[1], PSTR("%03dmL I: %02d:%02d"),
-				getSchedule(scheduleChoice)->getDailyVolume(),
-				getSchedule(scheduleChoice)->getInterval().getHour(),
-				getSchedule(scheduleChoice)->getInterval().getMinute());
-		displayLineLeft(0, bufs[0]);
-		displayLineLeft(1, bufs[1]);
-		state++;
-		break;
-
-	}
-	case 3: {
 		if (checkButton()) {
 			buttonOff();
 			encoderOff();
 			state = 0;
 			return true;
 		}
+		char bufs[2][NUM_LCD_COLS + 1];
+		sprintf_P(bufs[0], PSTR("%02d:%02d to %02d:%02d%n"),
+				getSchedule(scheduleChoice)->getStartTime().getHour(),
+				getSchedule(scheduleChoice)->getStartTime().getMinute(),
+				getSchedule(scheduleChoice)->getEndTime().getHour(),
+				getSchedule(scheduleChoice)->getEndTime().getMinute());
+		sprintf_P(bufs[1], PSTR("%03dmL I: %02d:%02d%n"),
+				getSchedule(scheduleChoice)->getDailyVolume(),
+				getSchedule(scheduleChoice)->getInterval().getHour(),
+				getSchedule(scheduleChoice)->getInterval().getMinute());
+		displayLineLeft(0, bufs[0]);
+		displayLineLeft(1, bufs[1]);
+		break;
+
 	}
+
 	} // end switch (state)
 
 	return false;
@@ -1668,8 +1673,7 @@ boolean calibratePumpMenuItem() {
 
 	case 4: {
 		if (checkButton()) {
-			getSchedule(scheduleChoice)->setCalibration(outputVolume * 2,
-					outputVolume * 2);
+			getSchedule(scheduleChoice)->setCalibration(outputVolume * 2);
 			encoderOff();
 			buttonOff();
 			state = 0;
@@ -1715,3 +1719,131 @@ boolean calibratePumpMenuItem() {
  }
 
  */
+
+boolean calibratePwmMenuItem() {
+
+	static int scheduleChoice = 0;
+	static int state = 0;
+
+	static uint8_t pwmSetPoint = 0;
+	static uint8_t oldSetPoint = 0;
+
+ switch (state) {
+
+	case 0: {
+		buttonOn();
+		encoderOn();
+		scheduleChoice = 0;
+		state++;
+		break;
+	}
+	case 1: {  //  Choose a pump
+
+		if (checkButton()) {
+			state++;
+			pwmSetPoint = getSchedule(scheduleChoice)->getPump()->getPwmRate();
+			oldSetPoint = pwmSetPoint;
+			break;
+		}
+		useRotaryEncoder(scheduleChoice, 0, NUMBER_OF_PUMPS - 1);
+		displayLineLeft(0, F("Choose Pump:"));
+		displayLineLeft(1, getSchedule(scheduleChoice)->getName());
+		break;
+	}
+	case 2: {
+		if (checkButton()) {
+			getSchedule(scheduleChoice)->setPriming(true);
+			getSchedule(scheduleChoice)->turnPumpOn();
+			state++;
+			break;
+		}
+		displayLineLeft(0, F("Press to start:"));
+		displayLineLeft(1, getSchedule(scheduleChoice)->getName());
+		break;
+	}
+	case 3: {
+		if (checkButton()) {
+			getSchedule(scheduleChoice)->turnPumpOff();
+			if (pwmSetPoint != oldSetPoint) {
+				getSchedule(scheduleChoice)->saveCal(1);
+			}
+			encoderOff();
+			buttonOff();
+			scheduleChoice = 0;
+			state = 0;
+			return true;
+		}
+		useRotaryEncoder(pwmSetPoint, (byte) 0, (byte) 255);
+		displayLineLeft(0, F("Press to Set:"));
+		char buf[NUM_LCD_COLS + 1];
+		sprintf_P(buf, PSTR("PWM = %03d%n"), pwmSetPoint);
+		displayLineLeft(1, buf);
+		getSchedule(scheduleChoice)->getPump()->setPwmRate(pwmSetPoint);
+		getSchedule(scheduleChoice)->turnPumpOn();
+		break;
+	}
+ }  // end switch (state)
+ return false;
+ }
+		// What to do about the pump?   IS it on or off?  Have we even chosen a schedule yet?
+		//  No cancel can be allowed without a flag of some sort.
+//	if (cancelFlag) {
+//			state = 0;
+//			encoderOff();
+//			buttonOff();
+//			return true;
+//		}
+
+
+
+boolean showCalibrationMenuItem() {
+
+	static int scheduleChoice = 0;
+
+	static int state = 0;
+
+	switch (state) {
+
+	case 0: {
+		encoderOn();
+		buttonOn();
+		scheduleChoice = 0;
+		state++;
+		break;
+	}
+	case 1: {
+		if (checkButton()) {
+
+			state++;
+			break;
+		}
+		displayLineLeft(0, F("Choose Sched:"));
+		useRotaryEncoder(scheduleChoice, 0, NUMBER_OF_PUMPS - 1);
+		displayLineLeft(1, getSchedule(scheduleChoice)->getName());
+		break;
+	}
+	case 2: {
+		if (checkButton()) {
+			buttonOff();
+			encoderOff();
+			state = 0;
+			return true;
+		}
+
+		char bufs[2][NUM_LCD_COLS + 1];
+		sprintf_P(bufs[0], PSTR("Rate= %3d%n"),
+				getSchedule(scheduleChoice)->getPump()->getFlowRate());
+		sprintf_P(bufs[1], PSTR("PWM @ %03d %03d%%%n"),
+				getSchedule(scheduleChoice)->getPump()->getPwmRate(),
+				(getSchedule(scheduleChoice)->getPump()->getPwmRate() * 100
+						/ 255));
+		displayLineLeft(0, bufs[0]);
+		displayLineLeft(1, bufs[1]);
+		break;
+
+	}
+	} // end switch (state)
+
+	return false;
+
+}

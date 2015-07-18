@@ -30,7 +30,9 @@ const char M2_S9[] PROGMEM = "Exit";
 
 const char M3_S1[] PROGMEM = "Prime Pump";
 const char M3_S2[] PROGMEM = "Cal Pump";
-const char M3_S3[] PROGMEM = "Exit";
+const char M3_S3[] PROGMEM = "Cal PWM";
+const char M3_S4[] PROGMEM = "Show Cal";
+const char M3_S5[] PROGMEM = "Exit";
 
 
 
@@ -72,7 +74,9 @@ const char * const menu_3[] PROGMEM =
 {
   M3_S1,
   M3_S2,
-  M3_S3
+  M3_S3,
+  M3_S4,
+  M3_S5
 };
 
 const char * const menu_4[] PROGMEM =

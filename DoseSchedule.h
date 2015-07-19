@@ -116,7 +116,7 @@ private:
   void clearState();
 
   void saveSchedule(int cl = 1);
-  boolean getSchedule();
+  boolean getScheduleFromEEPROM();
   void saveCal(int cl = 1);
   boolean getCal();
   int isCal();

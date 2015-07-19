@@ -64,7 +64,7 @@ void DoseSchedule::startupCode(byte apin, int aloc, char* aname) {
 	//name = aname;
 	setName(aname);
 	container.setName(name);
-	if (!getSchedule()) {
+	if (!getScheduleFromEEPROM()) {
 		setEnabled(false);
 	}
 	if (!getCal()) {
@@ -97,21 +97,20 @@ void DoseSchedule::setCalibration(int aRate) {
 	notCalibratedAlert.setActive(false);
 }
 
-int DoseSchedule::getVolumeDosed(){
+int DoseSchedule::getVolumeDosed() {
 	return volume_dosed;
 }
 
-int DoseSchedule::getTargetVolume(){
+int DoseSchedule::getTargetVolume() {
 	return target_volume;
 }
 
-int DoseSchedule::getBoosterVolume(){
+int DoseSchedule::getBoosterVolume() {
 	return booster_volume;
 }
-int DoseSchedule::getBoosterDays(){
+int DoseSchedule::getBoosterDays() {
 	return booster_days;
 }
-
 
 unsigned long DoseSchedule::getPumpStartTime() {
 	return pump_start_time;
@@ -145,7 +144,7 @@ DoseContainer* DoseSchedule::getContainer() {
 	return &container;
 }
 
-DosingPump* DoseSchedule::getPump(){
+DosingPump* DoseSchedule::getPump() {
 	return &pump;
 }
 
@@ -176,6 +175,8 @@ void DoseSchedule::initSchedule() {
 
 	reset_flag = false;
 
+	boolean gotSched = false;
+
 	target_volume = set_volume;
 	//  **TODO
 	// If you set a new schedule while a booster is
@@ -186,10 +187,14 @@ void DoseSchedule::initSchedule() {
 	//  Simulate that it was already running
 	TimeOfDay init_time(now());
 
+	if (getState()) {
+		gotSched = true;  // If we have a good state saved, use that.
+	}
+
 	if (isInRange(init_time)) {
 
-		if (getState()) {
-			return;  // If we have a good state saved, use that.
+		if(gotSched){
+			return;
 		}
 
 		int set_point = (TimeOfDay::lengthOfTime(start_time, init_time)
@@ -431,7 +436,7 @@ void DoseSchedule::saveSchedule(int clr_flag) {
 	}
 }
 
-boolean DoseSchedule::getSchedule() {
+boolean DoseSchedule::getScheduleFromEEPROM() {
 	//  Gets the four user input variables from EEPROM and rebuilds the class
 
 	byte flag;
@@ -568,9 +573,22 @@ boolean DoseSchedule::getState() {
 	addr += readRTC_SRAM(addr, cv);
 	getContainer()->setCurrentVolume(cv);
 
-	if (currentTime - savedTime
-			>= (TimeOfDay::lengthOfTime(TimeOfDay(savedTime), end_time) * 60ul)) {
+	//  **TODO
+	//  Check this logic here!!!!
+
+	//  This whole time thing is fucked up.
+	//  Right now it only works if the schedule was last saved inside the range
+	//  and you restart before the end of the schedule.
+
+	unsigned long minutesOld = (currentTime - savedTime + 30) / 60;
+
+	if (minutesOld
+			>= (TimeOfDay::lengthOfTime(TimeOfDay(savedTime), end_time)))  {
 		return false;   // state is too old, a reset should have occurred.
+	}
+
+	if(!isInRange(TimeOfDay(savedTime))){
+		return false;
 	}
 
 	int lt;

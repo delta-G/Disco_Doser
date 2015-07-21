@@ -187,13 +187,11 @@ void DoseSchedule::initSchedule() {
 	//  Simulate that it was already running
 	TimeOfDay init_time(now());
 
-	if (getState()) {
-		gotSched = true;  // If we have a good state saved, use that.
-	}
+	gotSched = getState();  // If we have a good state saved, use that.
 
 	if (isInRange(init_time)) {
 
-		if(gotSched){
+		if (gotSched) {  // we have a good schedule point from earlier today.
 			return;
 		}
 
@@ -229,12 +227,13 @@ void DoseSchedule::resetSchedule() {
 	if (target_volume > maxVolume) {
 		volExceedAlert.setActive(true, 2, name, F("Max Vol Exceed"));
 	} else {
-		// **TODO
-		// The alert will only last one day.  We might fix this later.
-				volExceedAlert.setActive(false);
-			}
 
-		}
+		volExceedAlert.setActive(false);
+		// **TODO
+				// The alert will only last one day.  We might fix this later.
+	}
+
+}
 
 void DoseSchedule::runSchedule() {
 	if (!priming) {
@@ -373,6 +372,7 @@ void DoseSchedule::createBooster(int _vol, int _days) {
 		target_volume += day1_volume;
 	}
 	//  If not in the window, then the call to addBooster with the first dose will handle everything.
+	saveState();
 }
 
 void DoseSchedule::addBooster() {
@@ -579,27 +579,31 @@ boolean DoseSchedule::getState() {
 	//  This whole time thing is fucked up.
 	//  Right now it only works if the schedule was last saved inside the range
 	//  and you restart before the end of the schedule.
+	boolean retval = false;
 
 	unsigned long minutesOld = (currentTime - savedTime + 30) / 60;
 
-	if (minutesOld
-			>= (TimeOfDay::lengthOfTime(TimeOfDay(savedTime), end_time)))  {
-		return false;   // state is too old, a reset should have occurred.
+	if ((isInRange(TimeOfDay(savedTime)))
+			&& (minutesOld
+					< (TimeOfDay::lengthOfTime(TimeOfDay(savedTime), end_time)))) {
+		int lt;
+		addr += readRTC_SRAM(addr, lt);
+		last_time.setTime(lt);
+
+		addr += readRTC_SRAM(addr, volume_dosed);
+		addr += readRTC_SRAM(addr, target_volume);
+		retval = true;
+
+	} else {
+		addr += 6;
+		last_time.setTime(end_time.getTime());
 	}
 
-	if(!isInRange(TimeOfDay(savedTime))){
-		return false;
+	if (minutesOld <= 1440) {
+		addr += readRTC_SRAM(addr, booster_volume);
+		addr += readRTC_SRAM(addr, booster_days);
 	}
 
-	int lt;
-	addr += readRTC_SRAM(addr, lt);
-	last_time.setTime(lt);
-
-	addr += readRTC_SRAM(addr, volume_dosed);
-	addr += readRTC_SRAM(addr, target_volume);
-	addr += readRTC_SRAM(addr, booster_volume);
-	addr += readRTC_SRAM(addr, booster_days);
-
-	return true;
+	return retval;
 
 }

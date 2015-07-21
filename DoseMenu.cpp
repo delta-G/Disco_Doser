@@ -1135,10 +1135,10 @@ boolean showScheduleStateMenuItem() {
 			return true;
 		}
 		char bufs[2][NUM_LCD_COLS + 1];
-		sprintf_P(bufs[0], PSTR("%03d dosed of %03d"),
+		sprintf_P(bufs[0], PSTR("%03d dosed of %03d%n"),
 				getSchedule(scheduleChoice)->getVolumeDosed(),
 				getSchedule(scheduleChoice)->getTargetVolume());
-		sprintf_P(bufs[1], PSTR("Boost %03d in %02d"),
+		sprintf_P(bufs[1], PSTR("Boost %03d in %02d%n"),
 				getSchedule(scheduleChoice)->getBoosterVolume(),
 				getSchedule(scheduleChoice)->getBoosterDays());
 		displayLineLeft(0, bufs[0]);

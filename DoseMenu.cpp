@@ -1,6 +1,6 @@
 #include "DoseMenu.h"
 
-
+/*
 void (*menuFunction)();
 
 Branch_Function menu_Branches[] = { &branch_Base, &branch_Schedule,
@@ -81,6 +81,8 @@ void displayMenu() {
 			(char*) pgm_read_word((getMenuText(current_menu, (current_item + 1) % getMenuSize(current_menu)))));
 	displayLineLeft(currentLine++, outBuf);
 }
+
+*/
 
 // Default action from the branch functions
 void notImplementedError() {

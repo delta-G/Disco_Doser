@@ -1,4 +1,4 @@
-
+/*
 #include "DoseMenu.h"
 #include <avr/pgmspace.h>
 
@@ -109,3 +109,5 @@ int getMenuSize(int amenu){
 const char * const* getMenuText(int amenu, int aitem) {
   return &(menus[amenu][aitem]);  
 }
+
+*/

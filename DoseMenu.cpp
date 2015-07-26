@@ -1758,7 +1758,8 @@ boolean calibratePwmMenuItem() {
 		if (checkButton()) {
 			getSchedule(scheduleChoice)->turnPumpOff();
 			if (pwmSetPoint != oldSetPoint) {
-				getSchedule(scheduleChoice)->saveCal(1);
+				getSchedule(scheduleChoice)->saveCal(1);  // save the new value
+				getSchedule(scheduleChoice)->saveCal(0);  // clear the calibration flag
 			}
 			encoderOff();
 			buttonOff();

@@ -230,10 +230,10 @@ void DoseSchedule::resetSchedule() {
 
 		volExceedAlert.setActive(false);
 		// **TODO
-				// The alert will only last one day.  We might fix this later.
-	}
+		// The alert will only last one day.  We might fix this later.
+			}
 
-}
+		}
 
 void DoseSchedule::runSchedule() {
 	if (!priming) {
@@ -480,11 +480,16 @@ void DoseSchedule::saveCal(int clr_flag) {
 	{
 		flag |= 48;
 		writeToEEPROM(eeprom_location + 18, flag);
+		notCalibratedAlert.setActive(true, 2, name, F("NOT CALIBRATED"));
+		setEnabled(false);
 		return;
 	}
 
 	else {
 		flag &= ~16;   // Indicates a saved calibration
+
+		//  **TODO
+		//  check this next line...
 		if (PWM_ENABLED) {
 			flag &= ~32;  // Indicates calibrated with PWM on.
 		}

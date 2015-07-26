@@ -38,8 +38,8 @@
 
 #define ENCODER_INTERRUPT_PIN 2
 #define ENCODER_B_PIN 4
-#define ALK_PUMP_PIN 9
-#define CAL_PUMP_PIN 6
+#define ALK_PUMP_PIN 6
+#define CAL_PUMP_PIN 9
 #define BUTTON_PIN 8
 #define LCD_ENABLE_PIN A3
 #define RTC_SS_PIN 10

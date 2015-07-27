@@ -49,44 +49,51 @@ int setState(StateVar astate) {
 
 void doUI() {
 
-	switch (currentState) {
+	static unsigned long previousMillis = 0;
+	unsigned long currentMillis = millis();
+	if (currentMillis - previousMillis >= DISPLAY_DELAY) {
 
-	case RUN_STATE: {
-		doRunStateUI();
-		break;
-	}
+		previousMillis = currentMillis;
 
-	case MENU_STATE: {
-		doMenuStateUI();
-		break;
-	}
+		switch (currentState) {
 
-	case DOSE_STATE:   // Should set up to use the button to interrupt
-	{
-		doDoseStateUI();
-		boolean exitMe = true;
-		for (int i = 0; i < NUMBER_OF_PUMPS; i++) {
-			if (getSchedule(i)->isPumpRunning()) {
-				exitMe = false;
-				break;  // only need to find one running
+		case RUN_STATE: {
+			doRunStateUI();
+			break;
+		}
+
+		case MENU_STATE: {
+			doMenuStateUI();
+			break;
+		}
+
+		case DOSE_STATE:   // Should set up to use the button to interrupt
+		{
+			doDoseStateUI();
+			boolean exitMe = true;
+			for (int i = 0; i < NUMBER_OF_PUMPS; i++) {
+				if (getSchedule(i)->isPumpRunning()) {
+					exitMe = false;
+					break;  // only need to find one running
+				}
 			}
+			if (exitMe) {
+				currentState = RUN_STATE;
+			}
+			break;
 		}
-		if (exitMe) {
-			currentState = RUN_STATE;
+
+		case ALERT_STATE: {
+
+			doAlertStateUI();
+			break;
+
 		}
-		break;
+		}  // end switch (currentState)
+		figureTheColor();
+		doDisplay();
+		pollButton();
 	}
-
-	case ALERT_STATE: {
-
-		doAlertStateUI();
-		break;
-
-	}
-	}  // end switch (currentState)
-	figureTheColor();
-	doDisplay();
-	pollButton();
 }
 
 void figureTheColor() {

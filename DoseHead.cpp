@@ -131,11 +131,13 @@ void doRunStateUI(){
       runStateState = 1;
       // no break fall through to next state
     }
+    /* no break */
   case 1:
     {
       if(numberOfAlerts > 0){
-        if(millis() - runStateStartTime > ALERT_DELAY){
+        if((millis() - runStateStartTime > ALERT_DELAY) ||  checkRotaryEncoder()){
           buttonOff();
+          encoderOff();
           currentState = ALERT_STATE;
           runStateState = 0;
           break;
@@ -144,9 +146,13 @@ void doRunStateUI(){
       if(!isButtonOn()){
         buttonOn();
       }
+      if(!isEncoderOn()){
+    	  encoderOn();
+      }
       for(int i=0; i<NUMBER_OF_PUMPS; i++){
         if(getSchedule(i)->isPumpRunning()){
           buttonOff();
+          encoderOff();
           currentState = DOSE_STATE;
           runStateState = 0;
           break;  // break for loop

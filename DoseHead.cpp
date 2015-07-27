@@ -157,7 +157,8 @@ void doRunStateUI() {
 		}
 		if (currentState == RUN_STATE) {  // if it hasn't changed states
 			char buf[2][NUM_LCD_COLS];
-			timePrint(now(), buf[0], buf[1]);
+			//timePrint(now(), buf[0], buf[1]);
+			buildRunStateDisplay(buf[0], buf[1]);
 
 			displayLineLeft(0, buf[0]);
 			displayLineLeft(1, buf[1]);
@@ -165,6 +166,18 @@ void doRunStateUI() {
 		break;
 	}
 	}  // end switch (runStateState)
+}
+
+void buildRunStateDisplay(char* buf1, char* buf2) {
+	time_t cur = now();
+	sprintf_P(buf1, PSTR("%02d:%02d%c%3s%3d/%3d"), hour(cur), minute(cur),
+			(getSchedule(0)->isEnabled() ? '*' : '-'),
+			getSchedule(0)->getName(), getSchedule(0)->getVolumeDosed(),
+			getSchedule(0)->getTargetVolume());
+	sprintf_P(buf2, PSTR("     %c%3s%3d/%3d"),
+			(getSchedule(0)->isEnabled() ? '*' : '-'),
+			getSchedule(0)->getName(), getSchedule(0)->getVolumeDosed(),
+			getSchedule(0)->getTargetVolume());
 }
 
 void doDoseStateUI() {

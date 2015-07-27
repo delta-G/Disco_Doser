@@ -130,7 +130,6 @@ void removeAlert(int);
 
 DoseSchedule* getSchedule(int);
 void doRunStateUI();
-void buildRunStateDisplay(char*, char*);
 void doDoseStateUI();
 void doMenuStateUI();
 void doAlertStateUI();

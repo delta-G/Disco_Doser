@@ -174,7 +174,7 @@ void buildRunStateDisplay(char* buf1, char* buf2) {
 			(getSchedule(0)->isEnabled() ? '*' : '-'),
 			getSchedule(0)->getName(), getSchedule(0)->getVolumeDosed(),
 			getSchedule(0)->getTargetVolume());
-	sprintf_P(buf2, PSTR("     %c%3s%3d/%3d"),
+	sprintf_P(buf2, PSTR("%5s%c%3s%3d/%3d"),
 			(getSchedule(0)->isEnabled() ? '*' : '-'),
 			getSchedule(0)->getName(), getSchedule(0)->getVolumeDosed(),
 			getSchedule(0)->getTargetVolume());

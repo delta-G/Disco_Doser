@@ -206,11 +206,13 @@ void doAlertStateUI() {
 	static unsigned long alertStartTime;
 	static int alertState = 0;
 	static int currentAlertIndex = 0;
+	static boolean autoScroll = true;
 
 	switch (alertState) {
 	case 0: {
 		alertStartTime = millis();
 		alertState = 1;
+		autoScroll = true;
 
 		int maxLevel = 0;
 		for (int i = 0; i < numberOfAlerts; i++) {
@@ -230,7 +232,7 @@ void doAlertStateUI() {
 	}
 	case 1: {
 		if (millis() - alertStartTime > ALERT_DELAY) {
-			if (currentAlertIndex < numberOfAlerts - 1) {
+			if ((currentAlertIndex < numberOfAlerts - 1) && autoScroll ) {
 				currentAlertIndex += 1;
 				alertStartTime = millis();
 			} else {
@@ -276,6 +278,7 @@ void doAlertStateUI() {
 					useRotaryEncoder(currentAlertIndex, 0, numberOfAlerts - 1,
 							1);
 					alertStartTime = millis(); // reset if we're changing alerts.
+					autoScroll = false;
 				}
 				displayLineLeft(0, alertList[currentAlertIndex]->getText(0));
 				displayLineLeft(1, alertList[currentAlertIndex]->getText(1));

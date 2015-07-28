@@ -155,12 +155,19 @@ void doRunStateUI() {
 			runStateState = 0;
 			break;
 		}
-		if (currentState == RUN_STATE) {  // if it hasn't changed states
+		if (currentState == RUN_STATE) {  // if it hasn't changed state
+
+			static ProgressBar alkBar(0, 9, 8);
+			static ProgressBar calBar(1, 9, 8);
+
 			char buf[2][NUM_LCD_COLS];
-			timePrint(now(), buf[0], buf[1]);
+			//timePrint(now(), buf[0], buf[1]);
+			buildRunStateDisplay(buf[0], buf[1]);
 
 			displayLineLeft(0, buf[0]);
 			displayLineLeft(1, buf[1]);
+			alkBar.showProgBar(getSchedule(0)->getVolumeDosed() , getSchedule(0)->getTargetVolume());
+			calBar.showProgBar(getSchedule(1)->getVolumeDosed() , getSchedule(1)->getTargetVolume());
 		}
 		break;
 	}
@@ -170,15 +177,12 @@ void doRunStateUI() {
 
 void buildRunStateDisplay(char* buf1, char* buf2) {
 	time_t cur = now();
-	sprintf_P(buf1, PSTR("%02d:%02d%c%3s%3d/%3d"), hour(cur), minute(cur),
+	sprintf_P(buf1, PSTR("%02d:%02d%c%3s"), hour(cur), minute(cur),
 			(getSchedule(0)->isEnabled() ? '*' : '-'),
-			getSchedule(0)->getName(), getSchedule(0)->getVolumeDosed(),
-			getSchedule(0)->getTargetVolume());
-	sprintf_P(buf2, PSTR("     %c%3s%3d/%3d"),
+			getSchedule(0)->getName());
+	sprintf_P(buf2, PSTR("     %c%3s"),
 			(getSchedule(0)->isEnabled() ? '*' : '-'),
-			getSchedule(0)->getName(), getSchedule(0)->getVolumeDosed(),
-			getSchedule(0)->getTargetVolume());
-
+			getSchedule(0)->getName());
 }
 
 void doDoseStateUI() {

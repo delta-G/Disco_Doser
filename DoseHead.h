@@ -117,6 +117,8 @@
 #include "DoseInterface.h"
 #include "DoseDisplay.h"
 #include "DoseAlert.h"
+#include "ProgressBar.h"
+
 
 
 typedef void (*S_Function)();
@@ -130,6 +132,7 @@ void removeAlert(int);
 
 DoseSchedule* getSchedule(int);
 void doRunStateUI();
+void buildRunStateDisplay(char* , char*);
 void doDoseStateUI();
 void doMenuStateUI();
 void doAlertStateUI();

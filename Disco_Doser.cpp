@@ -15,6 +15,7 @@ void setup() {
 	initLCD();
 	initButton();
 	initEncoder();
+	ProgressBar::initProgBar();
 	RTC.begin(RTC_SS_PIN);
 	DoseAlert::setAlertHandler (alertHandler);
 	getSchedule(0)->startupCode(ALK_PUMP_PIN, EA_ALK_SCHEDULE, "Alk");

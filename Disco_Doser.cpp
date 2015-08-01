@@ -1,6 +1,7 @@
 // Do not remove the include below
 #include "Disco_Doser.h"
 #include "Time.h"
+#include "githash.h"
 
 
 uint8_t heartbeatPin = HEART_BEAT_PIN;  // I know it is redundant, but I want to be able to assign it with the rest of the pins in DoseHead.h
@@ -8,6 +9,11 @@ uint8_t heartState = 0;
 
 
 void setup() {
+
+	Serial.begin(115200);
+	delay(10);
+	Serial.println(GIT_HASH);
+
 
 	//pinMode(3, OUTPUT); // Need a 5V line for my button and encoder right now. Easier to reach pin 3 than +5V right now.
 	//digitalWrite(3, HIGH); //These first two lines will come out in the final product

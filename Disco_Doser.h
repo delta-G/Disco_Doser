@@ -35,6 +35,7 @@ void setup();
 
 
 void heartbeat();
+void splashScreen();
 
 
 //Do not add code below this line

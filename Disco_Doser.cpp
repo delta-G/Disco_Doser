@@ -9,12 +9,6 @@ uint8_t heartState = 0;
 
 
 void setup() {
-
-	Serial.begin(115200);
-	delay(10);
-	Serial.println(GIT_HASH);
-
-
 	//pinMode(3, OUTPUT); // Need a 5V line for my button and encoder right now. Easier to reach pin 3 than +5V right now.
 	//digitalWrite(3, HIGH); //These first two lines will come out in the final product
 	pinMode(heartbeatPin, OUTPUT);

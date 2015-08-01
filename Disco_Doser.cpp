@@ -56,14 +56,19 @@ void splashScreen() {
 			year(currentTime));
 	displayLineLeft(0, bufs[0]);
 	displayLineLeft(1, bufs[1]);
+	doDisplay();
 	delay(2000);
 #ifdef GIT_HASH
 	//  Enter Info Screen
 	if (digitalRead(BUTTON_PIN) == LOW) {
 		sprintf_P(bufs[0], PSTR("Commit hash"));
 		sprintf_P(bufs[1], PSTR("%.15s"), GIT_HASH);
+		displayLineLeft(0, bufs[0]);
+		displayLineLeft(1, bufs[1]);
+		doDisplay();
 		delay(2000);
-		while(digitalRead(BUTTON_PIN) == LOW);  // Wait for button release to continue.
+		while (digitalRead(BUTTON_PIN) == LOW)
+			;  // Wait for button release to continue.
 	}
 #endif
 }

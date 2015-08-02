@@ -5,3 +5,7 @@
 /.project
 /arduino/
 /spec.d
+/uploadToUno.bat
+/preRun.bat
+/.externalToolBuilders
+/githash.h

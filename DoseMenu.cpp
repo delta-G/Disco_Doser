@@ -560,6 +560,10 @@ boolean setTheTime() {
 			setSyncProvider(RTC.get);  // Forces a sync at next check of time
 			buttonOff();
 			state = 0;
+			// reinitialize schedules.
+			for(int i = 0; i < NUMBER_OF_PUMPS; i++){
+				getSchedule(i)->initSchedule();
+			}
 			return true;
 		}
 		break;

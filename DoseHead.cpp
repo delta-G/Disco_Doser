@@ -157,7 +157,8 @@ void doRunStateUI() {
 		}
 		if (currentState == RUN_STATE) {  // if it hasn't changed states
 			char buf[2][NUM_LCD_COLS];
-			timePrint(now(), buf[0], buf[1]);
+//			timePrint(now(), buf[0], buf[1]);
+			buildRunStateDisplay(buf[0], buf[1]);
 
 			displayLineLeft(0, buf[0]);
 			displayLineLeft(1, buf[1]);

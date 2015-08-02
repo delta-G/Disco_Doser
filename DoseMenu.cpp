@@ -1316,6 +1316,7 @@ boolean resetContainerMenuItem() {
 
 	case 2: {
 		getSchedule(scheduleChoice)->getContainer()->fill();
+		getSchedule(scheduleChoice)->saveState();
 		state = 0;
 		encoderOff();
 		buttonOff();
@@ -1387,6 +1388,7 @@ boolean addToContainerMenuItem() {
 
 	case 3: {
 		getSchedule(scheduleChoice)->getContainer()->add(volumeChoice);
+		getSchedule(scheduleChoice)->saveState();
 		state = 0;
 		encoderOff();
 		buttonOff();
@@ -1458,6 +1460,7 @@ boolean setContainerVolumeMenuItem() {
 	case 3: {
 		getSchedule(scheduleChoice)->getContainer()->setCurrentVolume(
 				volumeChoice);
+		getSchedule(scheduleChoice)->saveState();
 		state = 0;
 		encoderOff();
 		buttonOff();
@@ -1527,6 +1530,7 @@ boolean setContainerSizeMenuItem() {
 
 	case 3: {
 		getSchedule(scheduleChoice)->getContainer()->setSize(volumeChoice);
+		getSchedule(scheduleChoice)->saveSchedule();
 		state = 0;
 		encoderOff();
 		buttonOff();

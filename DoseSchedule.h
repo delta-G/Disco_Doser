@@ -10,7 +10,6 @@
 #include "DoseAlert.h"
 #include "DS3234RTC.h"
 
-#define PWM_ENABLED false
 
 class DoseSchedule {
 

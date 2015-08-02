@@ -181,7 +181,6 @@ void DoseSchedule::initSchedule() {
 	boolean gotSched = false;
 
 	target_volume = set_volume;
-	//  **TODO
 	// If you set a new schedule while a booster is
 	// scheduled, you will lose one day of booster
 	// *****  NEED TO WORK OUT A FLAG TO FIX THIS
@@ -230,13 +229,9 @@ void DoseSchedule::resetSchedule() {
 	if (target_volume > maxVolume) {
 		volExceedAlert.setActive(true, 2, name, F("Max Vol Exceed"));
 	} else {
-
 		volExceedAlert.setActive(false);
-		// **TODO
-		// The alert will only last one day.  We might fix this later.
-			}
-
-		}
+	}
+}
 
 void DoseSchedule::runSchedule() {
 	if (!priming) {
@@ -389,7 +384,7 @@ void DoseSchedule::addBooster() {
 		booster_volume -= day_volume;
 		booster_days -= 1;
 	} else {
-		booster_volume = 0;  // If days == 0 then clear things out
+		booster_volume = 0;  // If days <= 0 then clear things out
 	}
 	saveState();
 }
@@ -490,11 +485,6 @@ void DoseSchedule::saveCal(int clr_flag) {
 	else {
 		flag &= ~16;   // Indicates a saved calibration
 
-		//  **TODO
-		//  check this next line...
-		if (PWM_ENABLED) {
-			flag &= ~32;  // Indicates calibrated with PWM on.
-		}
 		writeToEEPROM(eeprom_location + 20, (pump).pwm_rate);
 		writeToEEPROM(eeprom_location + 20 + 2, (pump).flow_rate);
 		writeToEEPROM(eeprom_location + 18, flag);
@@ -583,13 +573,10 @@ boolean DoseSchedule::getState() {
 	addr += readRTC_SRAM(addr, cv);
 	getContainer()->setCurrentVolume(cv);
 
-	//  **TODO
-	//  Check this logic here!!!!
-
 	//  Right now it only works if the schedule was last saved inside the range
 	//  and you restart before the end of the schedule.
 	boolean retval = false;
-	unsigned long minutesOld = 2000;  // longer than a day so if the next line doesn't set it right the following test will fail.
+	unsigned long minutesOld = 2000; // longer than a day so if the next line doesn't set it right the following test will fail.
 
 	// in case time gets set back
 	if (savedTime < currentTime) {
@@ -598,7 +585,8 @@ boolean DoseSchedule::getState() {
 
 	if ((isInRange(TimeOfDay(savedTime)))
 			&& (minutesOld
-					< (TimeOfDay::lengthOfTime(TimeOfDay(savedTime), end_time))) && (goodFlag >> 8 == 0x1F)) {
+					< (TimeOfDay::lengthOfTime(TimeOfDay(savedTime), end_time)))
+			&& (goodFlag >> 8 == 0x1F)) {
 		int lt;
 		addr += readRTC_SRAM(addr, lt);
 		last_time.setTime(lt);

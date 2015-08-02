@@ -535,7 +535,7 @@ void DoseSchedule::clearState() {
 	int addr = eeprom_location;
 	int badFlag = 0;
 	readRTC_SRAM(addr, badFlag);  // get old flag
-	badFlag &= 0xFF;  // Save low byte, clear high byte.
+	badFlag &= 0x00FF;  // Save low byte, clear high byte.
 	badFlag |= (0xC0 << 8);  // Mark schedule data as bad
 	writeRTC_SRAM(addr, badFlag);
 }
@@ -586,12 +586,15 @@ boolean DoseSchedule::getState() {
 	//  **TODO
 	//  Check this logic here!!!!
 
-	//  This whole time thing is fucked up.
 	//  Right now it only works if the schedule was last saved inside the range
 	//  and you restart before the end of the schedule.
 	boolean retval = false;
+	unsigned long minutesOld = 2000;  // longer than a day so if the next line doesn't set it right the following test will fail.
 
-	unsigned long minutesOld = (currentTime - savedTime + 30) / 60;
+	// in case time gets set back
+	if (savedTime < currentTime) {
+		minutesOld = (currentTime - savedTime + 30) / 60;
+	}
 
 	if ((isInRange(TimeOfDay(savedTime)))
 			&& (minutesOld

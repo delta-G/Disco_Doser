@@ -284,8 +284,6 @@ boolean DoseSchedule::checkTimer() {
 }
 
 boolean DoseSchedule::pumpTimer() {
-	//  TODO
-	//  Change return value to whether pump running at end or not
 
 	// Will return true if it turns the pump off
 	// or return false if it leaves it running

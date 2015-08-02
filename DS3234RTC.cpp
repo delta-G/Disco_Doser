@@ -126,14 +126,6 @@ void DS3234RTC::read( tmElements_t &tm)
 }
 
 
-
-//   **TODO
-//   Add a function to read or write a block to SRAM
-//   Similar to what we have for the EEPROM
-
-//   Have to add it in the Header since we use a template
-
-
 int DS3234RTC::writeToSRAM(uint8_t address , uint8_t* data, int size){
 
 	cs(LOW);

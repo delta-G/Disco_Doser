@@ -534,6 +534,9 @@ int DoseSchedule::isCal() {
 void DoseSchedule::clearState() {
 	int addr = eeprom_location;
 	int badFlag = 0;
+	readRTC_SRAM(addr, badFlag);  // get old flag
+	badFlag &= 0xFF;  // Save low byte, clear high byte.
+	badFlag |= (0xC0 << 8);  // Mark schedule data as bad
 	writeRTC_SRAM(addr, badFlag);
 }
 
@@ -541,7 +544,7 @@ void DoseSchedule::saveState() {
 
 	unsigned long currentTime = now();
 
-	int goodFlag = 123;
+	int goodFlag = (0x1F << 8) & 123;
 
 	int addr = eeprom_location;
 
@@ -567,7 +570,7 @@ boolean DoseSchedule::getState() {
 	int goodFlag = 0;
 	addr += readRTC_SRAM(addr, goodFlag);
 
-	if (goodFlag != 123) {
+	if (goodFlag & 0xFF != 123) {
 		return false;
 	}
 	unsigned long currentTime = now();
@@ -592,7 +595,7 @@ boolean DoseSchedule::getState() {
 
 	if ((isInRange(TimeOfDay(savedTime)))
 			&& (minutesOld
-					< (TimeOfDay::lengthOfTime(TimeOfDay(savedTime), end_time)))) {
+					< (TimeOfDay::lengthOfTime(TimeOfDay(savedTime), end_time))) && (goodFlag >> 8 == 0x1F)) {
 		int lt;
 		addr += readRTC_SRAM(addr, lt);
 		last_time.setTime(lt);

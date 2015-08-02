@@ -137,6 +137,8 @@ void doUI();
 int setState(StateVar);
 void figureTheColor();
 
+void buildRunStateDisplay(char*, char*);
+
 void runDosers();
 
 int freeRam();

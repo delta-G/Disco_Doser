@@ -92,8 +92,8 @@ void doUI() {
 		}  // end switch (currentState)
 		figureTheColor();
 		doDisplay();
-		pollButton();
 	}
+	pollButton();
 }
 
 void figureTheColor() {

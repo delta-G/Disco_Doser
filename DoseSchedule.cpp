@@ -585,7 +585,7 @@ boolean DoseSchedule::getState() {
 
 	if ((isInRange(TimeOfDay(savedTime)))
 			&& (minutesOld
-					< (TimeOfDay::lengthOfTime(TimeOfDay(savedTime), end_time)))
+					< (TimeOfDay::lengthOfTime(TimeOfDay(savedTime), end_time) % MIDNIGHT))
 			&& (goodFlag >> 8 == 0x1F)) {
 		int lt;
 		addr += readRTC_SRAM(addr, lt);

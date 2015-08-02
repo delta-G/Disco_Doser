@@ -1258,6 +1258,7 @@ boolean enableScheduleMenuItem() {
 		displayLineLeft(1, choice ? F("->Enable"):F("->Disable"));
 		break;
 	}
+	//  ERROR CASE
 	case 3: {
 		prevMillis = millis();
 		state++;

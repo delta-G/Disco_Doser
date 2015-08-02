@@ -51,9 +51,6 @@ void doBacklightColor() {
 #endif
 
 void doDisplay() {
-//	static unsigned long previousMillis = 0;
-//	unsigned long currentMillis = millis();
-//	if (currentMillis - previousMillis >= DISPLAY_DELAY) {
 #ifdef USING_SERIAL
 		Serial.print(F("0: "));
 		Serial.print(lineBuffer[0]);
@@ -77,8 +74,6 @@ void doDisplay() {
 		}
 #endif
 		doCursor();
-		//previousMillis = currentMillis;
-//	}
 }
 
 void displayTextLeft(int row, int scol, int cols, const char* message) {

@@ -32,7 +32,10 @@ void DoseSchedule::setEnabled(boolean boo) {
 	enabled = boo;
 	if (!boo) {
 		turnPumpOff();   // just in case the pump is running at the time.
+	} else {
+		initSchedule();
 	}
+	saveSchedule();
 }
 
 void DoseSchedule::setPriming(boolean abool) {

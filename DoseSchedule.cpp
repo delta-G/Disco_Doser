@@ -391,6 +391,7 @@ void DoseSchedule::addBooster() {
 	} else {
 		booster_volume = 0;  // If days == 0 then clear things out
 	}
+	saveState();
 }
 
 void DoseSchedule::singleDose(int aVolume) {

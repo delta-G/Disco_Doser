@@ -1140,9 +1140,9 @@ boolean showScheduleStateMenuItem() {
 			return true;
 		}
 		char bufs[2][NUM_LCD_COLS + 1];
-		sprintf_P(bufs[0], PSTR("%03d dosed of %03d%n"),
-				getSchedule(scheduleChoice)->getVolumeDosed(),
-				getSchedule(scheduleChoice)->getTargetVolume());
+		sprintf_P(bufs[0], PSTR("Last %02d:%02d"),
+				getSchedule(scheduleChoice)->getLastTime().getHour(),
+				getSchedule(scheduleChoice)->getLastTime().getMinute());
 		sprintf_P(bufs[1], PSTR("Boost %03d in %02d%n"),
 				getSchedule(scheduleChoice)->getBoosterVolume(),
 				getSchedule(scheduleChoice)->getBoosterDays());

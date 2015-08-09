@@ -115,6 +115,10 @@ int DoseSchedule::getBoosterDays() {
 	return booster_days;
 }
 
+TimeOfDay DoseSchedule::getLastTime() {
+	return last_time;
+}
+
 unsigned long DoseSchedule::getPumpStartTime() {
 	return pump_start_time;
 }

@@ -80,6 +80,7 @@ private:
   void setMaxVolume(int);
   void setName(char*);
   
+  TimeOfDay getLastTime();
   int getVolumeDosed();
   int getTargetVolume();
   int getBoosterVolume();

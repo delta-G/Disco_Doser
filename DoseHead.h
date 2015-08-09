@@ -127,6 +127,7 @@ enum StateVar {
 void alertHandler(DoseAlert*);
 void removeAlert(int);
 
+void recordDose(char, unsigned long, byte);
 
 DoseSchedule* getSchedule(int);
 void doRunStateUI();

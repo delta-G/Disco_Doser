@@ -1,6 +1,10 @@
 #include "DoseSchedule.h"
 #include "DoseHead.h"
 
+
+#define SRAM_LOCATION (eeprom_location - 50)
+
+
 void DoseSchedule::turnPumpOn() {
 	(pump).pumpOn();
 	pump_is_running = true;
@@ -275,6 +279,8 @@ boolean DoseSchedule::checkTimer() {
 		volume_dosed += run_volume;  // update the tally
 		last_time = run_time;   // set last_time to the current time
 
+		recordDose(name[0], now(), (byte)run_volume);
+
 		runPump(run_volume);
 		return true;
 	}
@@ -526,7 +532,7 @@ int DoseSchedule::isCal() {
 }
 
 void DoseSchedule::clearState() {
-	int addr = eeprom_location;
+	int addr = SRAM_LOCATION;
 	int badFlag = 0;
 	readRTC_SRAM(addr, badFlag);  // get old flag
 	badFlag &= 0x00FF;  // Save low byte, clear high byte.
@@ -540,7 +546,7 @@ void DoseSchedule::saveState() {
 
 	int goodFlag = (0x1F << 8) & 123;
 
-	int addr = eeprom_location;
+	int addr = SRAM_LOCATION;
 
 	addr += writeRTC_SRAM(addr, goodFlag);
 	addr += writeRTC_SRAM(addr, currentTime);
@@ -560,7 +566,7 @@ void DoseSchedule::saveState() {
 
 boolean DoseSchedule::getState() {
 
-	int addr = eeprom_location;
+	int addr = SRAM_LOCATION;
 	int goodFlag = 0;
 	addr += readRTC_SRAM(addr, goodFlag);
 

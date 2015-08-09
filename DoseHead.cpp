@@ -39,6 +39,22 @@ int freeRam() {
 	return (int) &v - (__brkval == 0 ? (int) &__heap_start : (int) __brkval);
 }
 
+
+void recordDose(char aName, unsigned long aTime, byte aVol){
+	static int addr = 62;
+	// reset address before overflowing
+	if(addr + 6 >= 255){
+		addr = 62;
+	}
+
+	addr += writeRTC_SRAM(addr, aName);
+	addr += writeRTC_SRAM(addr, aTime);
+	addr += writeRTC_SRAM(addr, aVol);
+
+}
+
+
+
 StateVar currentState = RUN_STATE;
 
 int setState(StateVar astate) {

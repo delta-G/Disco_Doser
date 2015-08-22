@@ -5,3 +5,6 @@
 /.project
 /arduino/
 /spec.d
+/uploadToNewBoard.bat
+/preRun.bat
+/.externalToolBuilders

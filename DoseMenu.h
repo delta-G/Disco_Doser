@@ -20,7 +20,7 @@
 
 //typedef prog_char menu_t;
 
-
+/*
 
 enum { 
   SET_TIME, SCHEDULE, SINGLE_DOSE, BOOSTER, PUMP, CONTAINER, RUN};
@@ -41,7 +41,7 @@ enum {
 enum { 
   RESET_CONTAINER , ADD_TO_CONTAINER , SET_CONTAINER_VOLUME, SET_CONTAINER_SIZE, EXIT_CONT_MENU};
 
-
+*/
 
 
 
@@ -58,10 +58,10 @@ boolean notImplementedError();
 //void branch_Pump();
 //void branch_Container();
 
-typedef void (*Branch_Function)();
+//typedef void (*Branch_Function)();
 
-enum {
-  BASE_MENU, SCHEDULE_MENU, PUMP_MENU, CONTAINER_MENU};
+//enum {
+//  BASE_MENU, SCHEDULE_MENU, PUMP_MENU, CONTAINER_MENU};
 
 
 

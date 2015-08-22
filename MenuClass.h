@@ -14,7 +14,6 @@
 #include "DoseInterface.h"
 
 typedef bool (*Item_Function)();
-typedef void (v_Func)();
 
 class MenuItem {
 
@@ -48,7 +47,7 @@ public:
 			menuItems(aMenu), listSize(asize) {
 	}
 
-	MenuItem getItem(int);
+	MenuItem* getItem(int);
 
 };
 
@@ -56,19 +55,16 @@ public:
 
 class MenuClass {
 
-	MenuList* menu;
-	int numMenus;
-	MenuList currentMenu;
+	static MenuList *currentMenu;
 	int currentItemIndex;
 	static boolean cancelFlag;
-	//v_Func menuFunc;
 	boolean runningFunction;
 
 	MenuClass();
-	MenuClass(MenuList* aList, int aNum);
 
 	void doMenu();
 	void displayMenu();
+	static void setCurrentMenu(MenuList*);
 
 };
 

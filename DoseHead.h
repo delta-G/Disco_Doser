@@ -38,8 +38,8 @@
 
 #define ENCODER_INTERRUPT_PIN 2
 #define ENCODER_B_PIN 4
-#define ALK_PUMP_PIN 9
-#define CAL_PUMP_PIN 6
+#define ALK_PUMP_PIN 6
+#define CAL_PUMP_PIN 9
 #define BUTTON_PIN 8
 #define LCD_ENABLE_PIN A3
 #define RTC_SS_PIN 10
@@ -74,8 +74,8 @@
 #define EA_CALIBRATION_FLAGS 16
 #define EA_ALK_PUMP 18
 #define EA_CA_PUMP 28
-#define EA_ALK_SCHEDULE 50
-#define EA_CA_SCHEDULE 80
+#define EA_ALK_SCHEDULE 50  // also serving as SRAM address for state variables
+#define EA_CA_SCHEDULE 80   // also serving as SRAM address for state variables
 
 
 /***********  CONSTANTS  ***********/
@@ -126,6 +126,7 @@ enum StateVar {
 void alertHandler(DoseAlert*);
 void removeAlert(int);
 
+void recordDose(char, unsigned long, byte);
 
 DoseSchedule* getSchedule(int);
 void doRunStateUI();
@@ -135,6 +136,8 @@ void doAlertStateUI();
 void doUI();
 int setState(StateVar);
 void figureTheColor();
+
+void buildRunStateDisplay(char*, char*);
 
 void runDosers();
 

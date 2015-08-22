@@ -28,12 +28,12 @@ enum {
 
 
 enum { 
-  SET_SCHEDULE, SET_SCHEDULE_NAME, ADJUST_VOLUME , ADJUST_MAX , SHOW_SCHEDULE ,  MATCH_SCHEDULE , ENABLE_SCHEDULE , SAVE_SCHEDULE, GET_SAVED, CLEAR_SAVED, EXIT_SCHED_MENU};
+  SET_SCHEDULE, SET_SCHEDULE_NAME, ADJUST_VOLUME , ADJUST_MAX , SHOW_SCHEDULE ,  SHOW_STATE , MATCH_SCHEDULE , ENABLE_SCHEDULE , CLEAR_SAVED, EXIT_SCHED_MENU};
 
 
 
 enum { 
-  PRIME_PUMP , CALIBRATE_PUMP , EXIT_PUMP_MENU };
+  PRIME_PUMP , CALIBRATE_PUMP , CALIBRATE_PWM , SHOW_CALIBRATION , EXIT_PUMP_MENU };
 
 
 
@@ -78,6 +78,7 @@ boolean setScheduleNameMenuItem();
 boolean adjustVolumeMenuItem();
 boolean adjustMaxVolumeMenuItem();
 boolean showScheduleMenuItem();
+boolean showScheduleStateMenuItem();
 boolean matchScheduleMenuItem();
 boolean enableScheduleMenuItem();
 
@@ -88,6 +89,8 @@ boolean setContainerSizeMenuItem();
 
 boolean primePumpMenuItem();
 boolean calibratePumpMenuItem();
+boolean calibratePwmMenuItem();
+boolean showCalibrationMenuItem();
 boolean pwmSelectMenuItem();
 
 

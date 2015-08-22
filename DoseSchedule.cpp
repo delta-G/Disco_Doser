@@ -1,6 +1,10 @@
 #include "DoseSchedule.h"
 #include "DoseHead.h"
 
+
+#define SRAM_LOCATION (eeprom_location - 50)
+
+
 void DoseSchedule::turnPumpOn() {
 	(pump).pumpOn();
 	pump_is_running = true;
@@ -17,6 +21,7 @@ void DoseSchedule::runPump(int avol) {
 	pump_run_time = ((pump).startDosingPump(avol));
 	pump_is_running = true;
 	container.take(avol);
+	saveState();
 }
 
 boolean DoseSchedule::isPumpRunning() {
@@ -31,7 +36,10 @@ void DoseSchedule::setEnabled(boolean boo) {
 	enabled = boo;
 	if (!boo) {
 		turnPumpOff();   // just in case the pump is running at the time.
+	} else {
+		initSchedule();
 	}
+	saveSchedule();
 }
 
 void DoseSchedule::setPriming(boolean abool) {
@@ -63,7 +71,7 @@ void DoseSchedule::startupCode(byte apin, int aloc, char* aname) {
 	//name = aname;
 	setName(aname);
 	container.setName(name);
-	if (!getSchedule()) {
+	if (!getScheduleFromEEPROM()) {
 		setEnabled(false);
 	}
 	if (!getCal()) {
@@ -90,11 +98,29 @@ int DoseSchedule::getDailyVolume() {
 	return set_volume;
 }
 
-void DoseSchedule::setCalibration(int mini, int maxi) {
-	pump.minimum_flow_rate = mini;
-	pump.maximum_flow_rate = maxi;
+void DoseSchedule::setCalibration(int aRate) {
+	pump.flow_rate = aRate;
 	saveCal(1);
 	notCalibratedAlert.setActive(false);
+}
+
+int DoseSchedule::getVolumeDosed() {
+	return volume_dosed;
+}
+
+int DoseSchedule::getTargetVolume() {
+	return target_volume;
+}
+
+int DoseSchedule::getBoosterVolume() {
+	return booster_volume;
+}
+int DoseSchedule::getBoosterDays() {
+	return booster_days;
+}
+
+TimeOfDay DoseSchedule::getLastTime() {
+	return last_time;
 }
 
 unsigned long DoseSchedule::getPumpStartTime() {
@@ -129,6 +155,10 @@ DoseContainer* DoseSchedule::getContainer() {
 	return &container;
 }
 
+DosingPump* DoseSchedule::getPump() {
+	return &pump;
+}
+
 void DoseSchedule::setSchedule(TimeOfDay st, TimeOfDay en, TimeOfDay inter,
 		int vol) {
 	start_time = st;
@@ -144,17 +174,21 @@ void DoseSchedule::setSchedule(TimeOfDay st, TimeOfDay en, TimeOfDay inter,
 						% MIDNIGHT);
 	}
 
+	clearState();
+	saveSchedule();
 	initSchedule(); // initialize other variables in schedule to current point in time
 
 }
 
 void DoseSchedule::initSchedule() {
+
 	volume_dosed = 0;  // reset for next calculation
 
 	reset_flag = false;
 
+	boolean gotSched = false;
+
 	target_volume = set_volume;
-	//  **TODO
 	// If you set a new schedule while a booster is
 	// scheduled, you will lose one day of booster
 	// *****  NEED TO WORK OUT A FLAG TO FIX THIS
@@ -163,7 +197,14 @@ void DoseSchedule::initSchedule() {
 	//  Simulate that it was already running
 	TimeOfDay init_time(now());
 
+	gotSched = getState();  // If we have a good state saved, use that.
+
 	if (isInRange(init_time)) {
+
+		if (gotSched) {  // we have a good schedule point from earlier today.
+			return;
+		}
+
 		int set_point = (TimeOfDay::lengthOfTime(start_time, init_time)
 				% MIDNIGHT);
 
@@ -183,22 +224,22 @@ void DoseSchedule::initSchedule() {
 		reset_flag = true;
 		last_time = end_time;
 	}
+
+	saveState();
 }
 
 void DoseSchedule::resetSchedule() {
 	target_volume = set_volume;
-	if (booster_volume > 0)
+	if (booster_volume > 0) {
 		addBooster();   // This is where we pick up the booster
+	}
 
 	if (target_volume > maxVolume) {
 		volExceedAlert.setActive(true, 2, name, F("Max Vol Exceed"));
 	} else {
-		// **TODO
-		// The alert will only last one day.  We might fix this later.
-				volExceedAlert.setActive(false);
-			}
-
-		}
+		volExceedAlert.setActive(false);
+	}
+}
 
 void DoseSchedule::runSchedule() {
 	if (!priming) {
@@ -238,6 +279,8 @@ boolean DoseSchedule::checkTimer() {
 		volume_dosed += run_volume;  // update the tally
 		last_time = run_time;   // set last_time to the current time
 
+		recordDose(name[0], now(), (byte)run_volume);
+
 		runPump(run_volume);
 		return true;
 	}
@@ -246,8 +289,6 @@ boolean DoseSchedule::checkTimer() {
 }
 
 boolean DoseSchedule::pumpTimer() {
-	//  TODO
-	//  Change return value to whether pump running at end or not
 
 	// Will return true if it turns the pump off
 	// or return false if it leaves it running
@@ -337,6 +378,7 @@ void DoseSchedule::createBooster(int _vol, int _days) {
 		target_volume += day1_volume;
 	}
 	//  If not in the window, then the call to addBooster with the first dose will handle everything.
+	saveState();
 }
 
 void DoseSchedule::addBooster() {
@@ -352,8 +394,9 @@ void DoseSchedule::addBooster() {
 		booster_volume -= day_volume;
 		booster_days -= 1;
 	} else {
-		booster_volume = 0;  // If days == 0 then clear things out
+		booster_volume = 0;  // If days <= 0 then clear things out
 	}
+	saveState();
 }
 
 void DoseSchedule::singleDose(int aVolume) {
@@ -400,7 +443,7 @@ void DoseSchedule::saveSchedule(int clr_flag) {
 	}
 }
 
-boolean DoseSchedule::getSchedule() {
+boolean DoseSchedule::getScheduleFromEEPROM() {
 	//  Gets the four user input variables from EEPROM and rebuilds the class
 
 	byte flag;
@@ -430,7 +473,7 @@ boolean DoseSchedule::getSchedule() {
 
 		setEnabled(!(flag & 8));
 
-		initSchedule(); //  Reset the variables and simulate the last dose point.
+		initSchedule(); //  Reset the variables and simulate the last dose point or read saved state.
 
 		return true;
 	}
@@ -444,17 +487,16 @@ void DoseSchedule::saveCal(int clr_flag) {
 	{
 		flag |= 48;
 		writeToEEPROM(eeprom_location + 18, flag);
+		notCalibratedAlert.setActive(true, 2, name, F("NOT CALIBRATED"));
+		setEnabled(false);
 		return;
 	}
 
 	else {
 		flag &= ~16;   // Indicates a saved calibration
-		if (PWM_ENABLED) {
-			flag &= ~32;  // Indicates calibrated with PWM on.
-		}
-		writeToEEPROM(eeprom_location + 20, (pump).minimum_pwm_rate);
-		writeToEEPROM(eeprom_location + 20 + 2, (pump).minimum_flow_rate);
-		writeToEEPROM(eeprom_location + 20 + 6, (pump).maximum_flow_rate);
+
+		writeToEEPROM(eeprom_location + 20, (pump).pwm_rate);
+		writeToEEPROM(eeprom_location + 20 + 2, (pump).flow_rate);
 		writeToEEPROM(eeprom_location + 18, flag);
 	}
 }
@@ -467,9 +509,8 @@ boolean DoseSchedule::getCal() {
 	if (flag & 16) {
 		return false;    // Not Calibrated Flag is set
 	} else {
-		readFromEEPROM(eeprom_location + 20, (pump).minimum_pwm_rate);
-		readFromEEPROM(eeprom_location + 20 + 2, (pump).minimum_flow_rate);
-		readFromEEPROM(eeprom_location + 20 + 6, (pump).maximum_flow_rate);
+		readFromEEPROM(eeprom_location + 20, (pump).pwm_rate);
+		readFromEEPROM(eeprom_location + 20 + 2, (pump).flow_rate);
 
 		return true;
 	}
@@ -490,3 +531,90 @@ int DoseSchedule::isCal() {
 	}
 }
 
+void DoseSchedule::clearState() {
+	int addr = SRAM_LOCATION;
+	int badFlag = 0;
+	readRTC_SRAM(addr, badFlag);  // get old flag
+	badFlag &= 0x00FF;  // Save low byte, clear high byte.
+	badFlag |= (0xC0 << 8);  // Mark schedule data as bad
+	writeRTC_SRAM(addr, badFlag);
+}
+
+void DoseSchedule::saveState() {
+
+	unsigned long currentTime = now();
+
+	int goodFlag = (0x1F << 8) & 123;
+
+	int addr = SRAM_LOCATION;
+
+	addr += writeRTC_SRAM(addr, goodFlag);
+	addr += writeRTC_SRAM(addr, currentTime);
+
+	int cv = getContainer()->getCurrentVolume();
+	addr += writeRTC_SRAM(addr, cv);
+
+	int lt = last_time.getTime();
+	addr += writeRTC_SRAM(addr, lt);
+
+	addr += writeRTC_SRAM(addr, volume_dosed);
+	addr += writeRTC_SRAM(addr, target_volume);
+	addr += writeRTC_SRAM(addr, booster_volume);
+	addr += writeRTC_SRAM(addr, booster_days);
+
+}
+
+boolean DoseSchedule::getState() {
+
+	int addr = SRAM_LOCATION;
+	int goodFlag = 0;
+	addr += readRTC_SRAM(addr, goodFlag);
+
+	if (goodFlag & 0xFF != 123) {
+		return false;
+	}
+	unsigned long currentTime = now();
+	unsigned long savedTime = 0;
+	addr += readRTC_SRAM(addr, savedTime);
+	//TimeOfDay saveTOD(savedTime);
+	//int timeRemain = TimeOfDay::lengthOfTime( saveTOD, end_time);  // in minutes
+
+	int cv;
+	addr += readRTC_SRAM(addr, cv);
+	getContainer()->setCurrentVolume(cv);
+
+	//  Right now it only works if the schedule was last saved inside the range
+	//  and you restart before the end of the schedule.
+	boolean retval = false;
+	unsigned long minutesOld = 2000; // longer than a day so if the next line doesn't set it right the following test will fail.
+
+	// in case time gets set back
+	if (savedTime < currentTime) {
+		minutesOld = (currentTime - savedTime + 30) / 60;
+	}
+
+	if ((isInRange(TimeOfDay(savedTime)))
+			&& (minutesOld
+					< (TimeOfDay::lengthOfTime(TimeOfDay(savedTime), end_time) % MIDNIGHT))
+			&& (goodFlag >> 8 == 0x1F)) {
+		int lt;
+		addr += readRTC_SRAM(addr, lt);
+		last_time.setTime(lt);
+
+		addr += readRTC_SRAM(addr, volume_dosed);
+		addr += readRTC_SRAM(addr, target_volume);
+		retval = true;
+
+	} else {
+		addr += 6;
+		last_time.setTime(end_time.getTime());
+	}
+
+	if (minutesOld <= 1440) {
+		addr += readRTC_SRAM(addr, booster_volume);
+		addr += readRTC_SRAM(addr, booster_days);
+	}
+
+	return retval;
+
+}

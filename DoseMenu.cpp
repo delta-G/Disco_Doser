@@ -1,6 +1,8 @@
 #include "DoseMenu.h"
 
+
 /*
+
 void (*menuFunction)();
 
 Branch_Function menu_Branches[] = { &branch_Base, &branch_Schedule,
@@ -217,6 +219,16 @@ void branch_Schedule() {
 		break;
 	}
 
+	case SHOW_STATE: {
+		if (showScheduleStateMenuItem()) {
+			current_menu = (SCHEDULE_MENU);
+			current_item = 0;
+			menuFunction = doMenu;
+		}
+
+		break;
+	}
+
 	case MATCH_SCHEDULE: {
 		if (matchScheduleMenuItem()) {
 			current_menu = (SCHEDULE_MENU);
@@ -235,25 +247,25 @@ void branch_Schedule() {
 		break;
 	}
 
-	case SAVE_SCHEDULE: {
-		for (int pump_count = 0; pump_count < NUMBER_OF_PUMPS; pump_count++) {
-			getSchedule(pump_count)->saveSchedule();
-		}
-		current_menu = (SCHEDULE_MENU);
-		current_item = 0;
-		menuFunction = doMenu;
-		break;
-	}
-
-	case GET_SAVED: {
-		for (int pump_count = 0; pump_count < NUMBER_OF_PUMPS; pump_count++) {
-			getSchedule(pump_count)->getSchedule();
-		}
-		current_menu = (SCHEDULE_MENU);
-		current_item = 0;
-		menuFunction = doMenu;
-		break;
-	}
+//	case SAVE_SCHEDULE: {
+//		for (int pump_count = 0; pump_count < NUMBER_OF_PUMPS; pump_count++) {
+//			getSchedule(pump_count)->saveSchedule();
+//		}
+//		current_menu = (SCHEDULE_MENU);
+//		current_item = 0;
+//		menuFunction = doMenu;
+//		break;
+//	}
+//
+//	case GET_SAVED: {
+//		for (int pump_count = 0; pump_count < NUMBER_OF_PUMPS; pump_count++) {
+//			getSchedule(pump_count)->getSchedule();
+//		}
+//		current_menu = (SCHEDULE_MENU);
+//		current_item = 0;
+//		menuFunction = doMenu;
+//		break;
+//	}
 
 	case CLEAR_SAVED: {
 		for (int pump_count = 0; pump_count < NUMBER_OF_PUMPS; pump_count++) {
@@ -349,16 +361,23 @@ void branch_Pump() {
 
 	}
 
-		/*
-		 case PWM_SELECT: {
-		 if (pwmSelectMenuItem()) {
-		 current_menu = (PUMP_MENU);
-		 current_item = 0;
-		 menuFunction = doMenu;
-		 }
-		 break;
-		 }
-		 */
+	case CALIBRATE_PWM: {
+		if (calibratePwmMenuItem()) {
+			current_menu = (PUMP_MENU);
+			current_item = 0;
+			menuFunction = doMenu;
+		}
+		break;
+	}
+
+	case SHOW_CALIBRATION: {
+		if (showCalibrationMenuItem()) {
+			current_menu = (PUMP_MENU);
+			current_item = 0;
+			menuFunction = doMenu;
+		}
+		break;
+	}
 
 	case EXIT_PUMP_MENU: {
 		current_menu = BASE_MENU;
@@ -546,6 +565,10 @@ boolean setTheTime() {
 			setSyncProvider(RTC.get);  // Forces a sync at next check of time
 			buttonOff();
 			state = 0;
+			// reinitialize schedules.
+			for(int i = 0; i < NUMBER_OF_PUMPS; i++){
+				getSchedule(i)->initSchedule();
+			}
 			return true;
 		}
 		break;
@@ -608,7 +631,8 @@ boolean singleDoseMenuItem() {
 			break;
 		}
 		displayLineLeft(0, F("Choose Volume:"));
-		useRotaryEncoder(volumeChoice, 0, MAX_SINGLE_DOSE, SINGLE_DOSE_INCREMENT);
+		useRotaryEncoder(volumeChoice, 0, MAX_SINGLE_DOSE,
+				SINGLE_DOSE_INCREMENT);
 		char buf[6];
 		sprintf_P(buf, PSTR("%03d%n"), volumeChoice);
 		displayLineLeft(1, buf);
@@ -690,19 +714,17 @@ boolean setBoosterDoseMenuItem() {
 			break;
 		}
 		displayLineLeft(0, F("Total Volume:"));
-		//  **TODO
-		//  Fix this to also take other boosters into account
-		//  Need that boosterActive flag in DoseSchedule done
-
-		//  **TODO
-		//  Fix this to allow for negative numbers
 
 		int maxAllow = ((getSchedule(scheduleChoice)->getMaxVolume()
-				- getSchedule(scheduleChoice)->getDailyVolume()) * (MAXIMUM_BOOSTER_DAYS -1));
+				- getSchedule(scheduleChoice)->getDailyVolume())
+				* (MAXIMUM_BOOSTER_DAYS - 1));
 		if (maxAllow > MAXIMUM_BOOSTER_DOSE) {
 			maxAllow = MAXIMUM_BOOSTER_DOSE;
 		}
-		useRotaryEncoder(volumeChoice, 0, maxAllow);
+
+		int minAllow = -(getSchedule(scheduleChoice)->getDailyVolume() * (MAXIMUM_BOOSTER_DAYS - 1));
+
+		useRotaryEncoder(volumeChoice, minAllow, maxAllow);
 		char buf[11];
 		sprintf_P(buf, PSTR("Change %+03d%n"), volumeChoice);
 		displayLineLeft(1, buf);
@@ -715,10 +737,14 @@ boolean setBoosterDoseMenuItem() {
 			break;
 		}
 		displayLineLeft(0, F("Spread Over"));
-
-		int minDays = (volumeChoice
-				/ (getSchedule(scheduleChoice)->getMaxVolume()
-						- getSchedule(scheduleChoice)->getDailyVolume())) + 1;
+		int minDays;
+		if (volumeChoice > 0) {
+			minDays = (volumeChoice
+					/ (getSchedule(scheduleChoice)->getMaxVolume()
+							- getSchedule(scheduleChoice)->getDailyVolume())) + 1;
+		} else {
+			minDays = (volumeChoice / getSchedule(scheduleChoice)->getDailyVolume()) + 1;
+		}
 
 		useRotaryEncoder(daysChoice, minDays, MAXIMUM_BOOSTER_DAYS);
 		char buf[8];
@@ -1033,7 +1059,6 @@ boolean adjustMaxVolumeMenuItem() {
 boolean showScheduleMenuItem() {
 
 	static int scheduleChoice = 0;
-	static int volumeChoice = 0;
 
 	static int state = 0;
 
@@ -1043,7 +1068,6 @@ boolean showScheduleMenuItem() {
 		encoderOn();
 		buttonOn();
 		scheduleChoice = 0;
-		volumeChoice = 0;
 		state++;
 		break;
 	}
@@ -1059,29 +1083,78 @@ boolean showScheduleMenuItem() {
 		break;
 	}
 	case 2: {
-		char bufs[2][NUM_LCD_COLS + 1];
-		sprintf_P(bufs[0], PSTR("%02d:%02d to %02d:%02d"),
-				getSchedule(scheduleChoice)->getStartTime().getHour(),
-				getSchedule(scheduleChoice)->getStartTime().getMinute(),
-				getSchedule(scheduleChoice)->getEndTime().getHour(),
-				getSchedule(scheduleChoice)->getEndTime().getMinute());
-		sprintf_P(bufs[1], PSTR("%03dmL I: %02d:%02d"),
-				getSchedule(scheduleChoice)->getDailyVolume(),
-				getSchedule(scheduleChoice)->getInterval().getHour(),
-				getSchedule(scheduleChoice)->getInterval().getMinute());
-		displayLineLeft(0, bufs[0]);
-		displayLineLeft(1, bufs[1]);
-		state++;
-		break;
-
-	}
-	case 3: {
 		if (checkButton()) {
 			buttonOff();
 			encoderOff();
 			state = 0;
 			return true;
 		}
+		char bufs[2][NUM_LCD_COLS + 1];
+		sprintf_P(bufs[0], PSTR("%02d:%02d to %02d:%02d%n"),
+				getSchedule(scheduleChoice)->getStartTime().getHour(),
+				getSchedule(scheduleChoice)->getStartTime().getMinute(),
+				getSchedule(scheduleChoice)->getEndTime().getHour(),
+				getSchedule(scheduleChoice)->getEndTime().getMinute());
+		sprintf_P(bufs[1], PSTR("%03dmL I: %02d:%02d%n"),
+				getSchedule(scheduleChoice)->getDailyVolume(),
+				getSchedule(scheduleChoice)->getInterval().getHour(),
+				getSchedule(scheduleChoice)->getInterval().getMinute());
+		displayLineLeft(0, bufs[0]);
+		displayLineLeft(1, bufs[1]);
+		break;
+
+	}
+
+	} // end switch (state)
+
+	return false;
+
+}
+
+boolean showScheduleStateMenuItem() {
+
+	static int scheduleChoice = 0;
+
+	static int state = 0;
+
+	switch (state) {
+
+	case 0: {
+		encoderOn();
+		buttonOn();
+		scheduleChoice = 0;
+		state++;
+		break;
+	}
+	case 1: {
+		if (checkButton()) {
+
+			state++;
+			break;
+		}
+		displayLineLeft(0, F("Choose Sched:"));
+		useRotaryEncoder(scheduleChoice, 0, NUMBER_OF_PUMPS - 1);
+		displayLineLeft(1, getSchedule(scheduleChoice)->getName());
+		break;
+	}
+	case 2: {
+		if (checkButton()) {
+			buttonOff();
+			encoderOff();
+			state = 0;
+			return true;
+		}
+		char bufs[2][NUM_LCD_COLS + 1];
+		sprintf_P(bufs[0], PSTR("Last %02d:%02d"),
+				getSchedule(scheduleChoice)->getLastTime().getHour(),
+				getSchedule(scheduleChoice)->getLastTime().getMinute());
+		sprintf_P(bufs[1], PSTR("Boost %03d in %02d%n"),
+				getSchedule(scheduleChoice)->getBoosterVolume(),
+				getSchedule(scheduleChoice)->getBoosterDays());
+		displayLineLeft(0, bufs[0]);
+		displayLineLeft(1, bufs[1]);
+		break;
+
 	}
 	} // end switch (state)
 
@@ -1195,6 +1268,7 @@ boolean enableScheduleMenuItem() {
 		displayLineLeft(1, choice ? F("->Enable"):F("->Disable"));
 		break;
 	}
+	//  ERROR CASE
 	case 3: {
 		prevMillis = millis();
 		state++;
@@ -1252,6 +1326,7 @@ boolean resetContainerMenuItem() {
 
 	case 2: {
 		getSchedule(scheduleChoice)->getContainer()->fill();
+		getSchedule(scheduleChoice)->saveState();
 		state = 0;
 		encoderOff();
 		buttonOff();
@@ -1323,6 +1398,7 @@ boolean addToContainerMenuItem() {
 
 	case 3: {
 		getSchedule(scheduleChoice)->getContainer()->add(volumeChoice);
+		getSchedule(scheduleChoice)->saveState();
 		state = 0;
 		encoderOff();
 		buttonOff();
@@ -1382,7 +1458,8 @@ boolean setContainerVolumeMenuItem() {
 		}
 		displayLineLeft(0, F("Vol in Cont:"));
 		useRotaryEncoder(volumeChoice, 0,
-				getSchedule(scheduleChoice)->getContainer()->getSize(), CONTAINER_SIZE_STEP);
+				getSchedule(scheduleChoice)->getContainer()->getSize(),
+				CONTAINER_SIZE_STEP);
 		char buf[6];
 		sprintf_P(buf, PSTR("%04d%n"), volumeChoice);
 		displayLineLeft(1, buf);
@@ -1393,6 +1470,7 @@ boolean setContainerVolumeMenuItem() {
 	case 3: {
 		getSchedule(scheduleChoice)->getContainer()->setCurrentVolume(
 				volumeChoice);
+		getSchedule(scheduleChoice)->saveState();
 		state = 0;
 		encoderOff();
 		buttonOff();
@@ -1451,7 +1529,8 @@ boolean setContainerSizeMenuItem() {
 			break;
 		}
 		displayLineLeft(0, F("Container Size:"));
-		useRotaryEncoder(volumeChoice, 0, MAXIMUM_CONTAINER_SIZE, CONTAINER_SIZE_STEP);
+		useRotaryEncoder(volumeChoice, 0, MAXIMUM_CONTAINER_SIZE,
+				CONTAINER_SIZE_STEP);
 		char buf[6];
 		sprintf_P(buf, PSTR("%04d%n"), volumeChoice);
 		displayLineLeft(1, buf);
@@ -1461,6 +1540,7 @@ boolean setContainerSizeMenuItem() {
 
 	case 3: {
 		getSchedule(scheduleChoice)->getContainer()->setSize(volumeChoice);
+		getSchedule(scheduleChoice)->saveSchedule();
 		state = 0;
 		encoderOff();
 		buttonOff();
@@ -1601,8 +1681,7 @@ boolean calibratePumpMenuItem() {
 
 	case 4: {
 		if (checkButton()) {
-			getSchedule(scheduleChoice)->setCalibration(outputVolume * 2,
-					outputVolume * 2);
+			getSchedule(scheduleChoice)->setCalibration(outputVolume * 2);
 			encoderOff();
 			buttonOff();
 			state = 0;
@@ -1621,30 +1700,157 @@ boolean calibratePumpMenuItem() {
 	return false;
 }
 /*
-boolean pwmSelectMenuItem() {
+ boolean pwmSelectMenuItem() {
 
+ static int state = 0;
+ static unsigned long startTime = 0;
+
+ switch (state) {
+
+ case 0: {
+ startTime = millis();
+ state++;
+ // no break, go ahead and fall through to state 1.
+ }
+ case 1: {
+ if (millis() - startTime >= 2000) {
+ state = 0;
+ return true;
+ }
+ displayLineLeft(0, F("PWM not"));
+ displayLineLeft(1, F("Implemented"));
+ break;
+ }
+
+ }  // end switch (state)
+ return false;
+ }
+
+ */
+
+boolean calibratePwmMenuItem() {
+
+	static int scheduleChoice = 0;
 	static int state = 0;
-	static unsigned long startTime = 0;
+
+	static uint8_t pwmSetPoint = 0;
+	static uint8_t oldSetPoint = 0;
 
 	switch (state) {
 
 	case 0: {
-		startTime = millis();
+		buttonOn();
+		encoderOn();
+		scheduleChoice = 0;
 		state++;
-		// no break, go ahead and fall through to state 1.
+		break;
 	}
-	case 1: {
-		if (millis() - startTime >= 2000) {
+	case 1: {  //  Choose a pump
+
+		if (checkButton()) {
+			state++;
+			pwmSetPoint = getSchedule(scheduleChoice)->getPump()->getPwmRate();
+			oldSetPoint = pwmSetPoint;
+			break;
+		}
+		useRotaryEncoder(scheduleChoice, 0, NUMBER_OF_PUMPS - 1);
+		displayLineLeft(0, F("Choose Pump:"));
+		displayLineLeft(1, getSchedule(scheduleChoice)->getName());
+		break;
+	}
+	case 2: {
+		if (checkButton()) {
+			getSchedule(scheduleChoice)->setPriming(true);
+			getSchedule(scheduleChoice)->turnPumpOn();
+			state++;
+			break;
+		}
+		displayLineLeft(0, F("Press to start:"));
+		displayLineLeft(1, getSchedule(scheduleChoice)->getName());
+		break;
+	}
+	case 3: {
+		if (checkButton()) {
+			getSchedule(scheduleChoice)->turnPumpOff();
+			if (pwmSetPoint != oldSetPoint) {
+				getSchedule(scheduleChoice)->saveCal(1);  // save the new value
+				getSchedule(scheduleChoice)->saveCal(0);  // clear the calibration flag
+			}
+			encoderOff();
+			buttonOff();
+			scheduleChoice = 0;
 			state = 0;
 			return true;
 		}
-		displayLineLeft(0, F("PWM not"));
-		displayLineLeft(1, F("Implemented"));
+		useRotaryEncoder(pwmSetPoint, (byte) 0, (byte) 255);
+		displayLineLeft(0, F("Press to Set:"));
+		char buf[NUM_LCD_COLS + 1];
+		sprintf_P(buf, PSTR("PWM = %03d%n"), pwmSetPoint);
+		displayLineLeft(1, buf);
+		getSchedule(scheduleChoice)->getPump()->setPwmRate(pwmSetPoint);
+		getSchedule(scheduleChoice)->turnPumpOn();
 		break;
 	}
-
 	}  // end switch (state)
 	return false;
 }
+// What to do about the pump?   IS it on or off?  Have we even chosen a schedule yet?
+//  No cancel can be allowed without a flag of some sort.
+//	if (cancelFlag) {
+//			state = 0;
+//			encoderOff();
+//			buttonOff();
+//			return true;
+//		}
 
-*/
+boolean showCalibrationMenuItem() {
+
+	static int scheduleChoice = 0;
+
+	static int state = 0;
+
+	switch (state) {
+
+	case 0: {
+		encoderOn();
+		buttonOn();
+		scheduleChoice = 0;
+		state++;
+		break;
+	}
+	case 1: {
+		if (checkButton()) {
+
+			state++;
+			break;
+		}
+		displayLineLeft(0, F("Choose Sched:"));
+		useRotaryEncoder(scheduleChoice, 0, NUMBER_OF_PUMPS - 1);
+		displayLineLeft(1, getSchedule(scheduleChoice)->getName());
+		break;
+	}
+	case 2: {
+		if (checkButton()) {
+			buttonOff();
+			encoderOff();
+			state = 0;
+			return true;
+		}
+
+		char bufs[2][NUM_LCD_COLS + 1];
+		sprintf_P(bufs[0], PSTR("Rate= %3d%n"),
+				getSchedule(scheduleChoice)->getPump()->getFlowRate());
+		sprintf_P(bufs[1], PSTR("PWM @ %03d %03d%%%n"),
+				getSchedule(scheduleChoice)->getPump()->getPwmRate(),
+				(getSchedule(scheduleChoice)->getPump()->getPwmRate() * 100
+						/ 255));
+		displayLineLeft(0, bufs[0]);
+		displayLineLeft(1, bufs[1]);
+		break;
+
+	}
+	} // end switch (state)
+
+	return false;
+
+}

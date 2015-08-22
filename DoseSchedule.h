@@ -8,8 +8,8 @@
 #include "EepromFuncs.h"
 #include "DoseContainer.h"
 #include "DoseAlert.h"
+#include "DS3234RTC.h"
 
-#define PWM_ENABLED false
 
 class DoseSchedule {
 
@@ -80,11 +80,19 @@ private:
   void setMaxVolume(int);
   void setName(char*);
   
+  TimeOfDay getLastTime();
+  int getVolumeDosed();
+  int getTargetVolume();
+  int getBoosterVolume();
+  int getBoosterDays();
+  
+  DosingPump* getPump();
+  
   void setEnabled(boolean);
   boolean isEnabled();
   void setPriming(boolean);
   
-  void setCalibration(int, int);
+  void setCalibration(int);
   
   DoseContainer* getContainer();
   
@@ -103,8 +111,12 @@ private:
   
   void singleDose(int);
 
+  void saveState();
+  boolean getState();
+  void clearState();
+
   void saveSchedule(int cl = 1);
-  boolean getSchedule();
+  boolean getScheduleFromEEPROM();
   void saveCal(int cl = 1);
   boolean getCal();
   int isCal();

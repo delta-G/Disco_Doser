@@ -20,18 +20,19 @@ const char M2_S11[] PROGMEM = "Set Name";
 const char M2_S2[] PROGMEM = "Adjust Volume";
 const char M2_S3[] PROGMEM = "Set Max Volume";
 const char M2_S4[] PROGMEM = "Show Schedule";
-const char M2_S5[] PROGMEM = "Match Schedule";
-const char M2_S6[] PROGMEM = "Enable Schedule";
-const char M2_S7[] PROGMEM = "Save Schedule";
-const char M2_S8[] PROGMEM = "Get Saved";
-const char M2_S9[] PROGMEM = "Clear Saved";
-const char M2_S10[] PROGMEM = "Exit";
+const char M2_S5[] PROGMEM = "Show State";
+const char M2_S6[] PROGMEM = "Match Schedule";
+const char M2_S7[] PROGMEM = "Enable Schedule";
+const char M2_S8[] PROGMEM = "Clear Saved";
+const char M2_S9[] PROGMEM = "Exit";
 
 
 
 const char M3_S1[] PROGMEM = "Prime Pump";
 const char M3_S2[] PROGMEM = "Cal Pump";
-const char M3_S3[] PROGMEM = "Exit";
+const char M3_S3[] PROGMEM = "Cal PWM";
+const char M3_S4[] PROGMEM = "Show Cal";
+const char M3_S5[] PROGMEM = "Exit";
 
 
 
@@ -66,15 +67,16 @@ const char * const menu_2[] PROGMEM =
   M2_S6,
   M2_S7,
   M2_S8,
-  M2_S9,
-  M2_S10
+  M2_S9
 };
 
 const char * const menu_3[] PROGMEM =
 {
   M3_S1,
   M3_S2,
-  M3_S3
+  M3_S3,
+  M3_S4,
+  M3_S5
 };
 
 const char * const menu_4[] PROGMEM =

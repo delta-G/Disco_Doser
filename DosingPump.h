@@ -1,4 +1,6 @@
 
+
+
 #ifndef DosingPump_h
 #define DosingPump_h
 
@@ -13,24 +15,23 @@
 class DosingPump{
   
         public: 
-        unsigned int minimum_flow_rate;
-        unsigned int maximum_flow_rate;
-        int minimum_pwm_rate;
-        int maximum_pwm_rate;
+        unsigned int flow_rate;
+        int pwm_rate;
         byte pump_pin;
         
         DosingPump(byte pump_pin);
 	    DosingPump();
         void initPump(byte);
-        void runDosingPump(unsigned int volume, int rate);
-        unsigned long startDosingPump(unsigned int volume, int rate);
+        void setPwmRate(uint8_t);
+        uint8_t getPwmRate();
+        int getFlowRate();
+
         unsigned long startDosingPump(unsigned int volume);
         void pumpOn();
         void pumpOff();
         
-        private:
-        int rateToPWM(int rate);
         
 };
 
 #endif
+

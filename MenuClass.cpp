@@ -25,7 +25,7 @@ MenuClass::MenuClass(MenuList* aList, int aNum) {
 	//menuFunc = showMenu();
 }
 
-void MenuClass::showMenu() {
+void MenuClass::doMenu() {
 
 	if (runningFunction) {
 		runningFunction = !currentMenu.getItem(currentItemIndex).runItem();

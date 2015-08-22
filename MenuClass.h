@@ -67,7 +67,7 @@ class MenuClass {
 	MenuClass();
 	MenuClass(MenuList* aList, int aNum);
 
-	void showMenu();
+	void doMenu();
 	void displayMenu();
 
 };

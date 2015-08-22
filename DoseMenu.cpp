@@ -87,7 +87,7 @@ void displayMenu() {
 */
 
 // Default action from the branch functions
-void notImplementedError() {
+boolean notImplementedError() {
 	static unsigned long prevMil;
 	static int state = 0;
 	switch (state) {
@@ -100,16 +100,15 @@ void notImplementedError() {
 	case 1:
 		if (millis() - prevMil > 4000) {
 			state = 0;
-			//current_menu = (BASE_MENU);
-			//current_item = 0;
-			menuFunction = doMenu;
+			return true;
 		} else {
 			displayLineLeft(0, F("Oops Something's"));
 			displayLineLeft(1, F("Not Implemented"));
+			return false;
 		}
 	}
 }
-
+/*
 //  This gets run if a menu item gets selected. 
 void branch_Base() {
 	switch (current_item) {
@@ -390,7 +389,7 @@ void branch_Pump() {
 	}  // end switch (current_item)
 
 }
-
+*/
 boolean inputTime(time_t& var) {
 
 	static int state = 0;
@@ -470,7 +469,7 @@ boolean inputTime(time_t& var) {
 
 	}  // end of switch (state)
 
-	if (cancelFlag) {
+	if (MenuClass::cancelFlag) {
 		state = 0;
 		encoderOff();
 		buttonOff();
@@ -527,7 +526,7 @@ boolean inputTimeOfDay(TimeOfDay& var) {
 
 	}  // end of switch (state)
 
-	if (cancelFlag) {
+	if (MenuClass::cancelFlag) {
 		state = 0;
 		encoderOff();
 		buttonOff();
@@ -587,7 +586,7 @@ boolean setTheTime() {
 	displayLineLeft(0, outBuf[0]);
 	displayLineLeft(1, outBuf[1]);
 
-	if (cancelFlag) {
+	if (MenuClass::cancelFlag) {
 		state = 0;
 		buttonOff();
 		return true;
@@ -665,7 +664,7 @@ boolean singleDoseMenuItem() {
 	}
 	} // end switch (state)
 
-	if (cancelFlag) {
+	if (MenuClass::cancelFlag) {
 		state = 0;
 		encoderOff();
 		buttonOff();
@@ -762,7 +761,7 @@ boolean setBoosterDoseMenuItem() {
 
 	} // end switch (state)
 
-	if (cancelFlag) {
+	if (MenuClass::cancelFlag) {
 		state = 0;
 		encoderOff();
 		buttonOff();
@@ -869,7 +868,7 @@ boolean setScheduleMenuItem() {
 
 	} // end switch (state)
 
-	if (cancelFlag) {
+	if (MenuClass::cancelFlag) {
 		state = 0;
 		encoderOff();
 		buttonOff();
@@ -985,7 +984,7 @@ boolean adjustVolumeMenuItem() {
 
 	} // end switch (state)
 
-	if (cancelFlag) {
+	if (MenuClass::cancelFlag) {
 		state = 0;
 		encoderOff();
 		buttonOff();
@@ -1046,7 +1045,7 @@ boolean adjustMaxVolumeMenuItem() {
 
 	} // end switch (state)
 
-	if (cancelFlag) {
+	if (MenuClass::cancelFlag) {
 		state = 0;
 		encoderOff();
 		buttonOff();
@@ -1335,7 +1334,7 @@ boolean resetContainerMenuItem() {
 
 	} // end switch (state)
 
-	if (cancelFlag) {
+	if (MenuClass::cancelFlag) {
 		state = 0;
 		encoderOff();
 		buttonOff();
@@ -1407,7 +1406,7 @@ boolean addToContainerMenuItem() {
 
 	} // end switch (state)
 
-	if (cancelFlag) {
+	if (MenuClass::cancelFlag) {
 		state = 0;
 		encoderOff();
 		buttonOff();
@@ -1479,7 +1478,7 @@ boolean setContainerVolumeMenuItem() {
 
 	} // end switch (state)
 
-	if (cancelFlag) {
+	if (MenuClass::cancelFlag) {
 		state = 0;
 		encoderOff();
 		buttonOff();
@@ -1549,7 +1548,7 @@ boolean setContainerSizeMenuItem() {
 
 	} // end switch (state)
 
-	if (cancelFlag) {
+	if (MenuClass::cancelFlag) {
 		state = 0;
 		encoderOff();
 		buttonOff();
@@ -1796,7 +1795,7 @@ boolean calibratePwmMenuItem() {
 }
 // What to do about the pump?   IS it on or off?  Have we even chosen a schedule yet?
 //  No cancel can be allowed without a flag of some sort.
-//	if (cancelFlag) {
+//	if (MenuClass::cancelFlag) {
 //			state = 0;
 //			encoderOff();
 //			buttonOff();

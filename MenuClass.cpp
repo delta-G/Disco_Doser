@@ -29,7 +29,6 @@ void MenuClass::showMenu() {
 
 	if (runningFunction) {
 		runningFunction = !currentMenu.getItem(currentItemIndex).runItem();
-
 	} else {
 		cancelFlag = false; // If we're here it's either been cancelled or doesn't need to be.
 		showCursor(false);  // If we're here we don't need it.

@@ -60,7 +60,7 @@ class MenuClass {
 	int numMenus;
 	MenuList currentMenu;
 	int currentItemIndex;
-	boolean cancelFlag;
+	static boolean cancelFlag;
 	//v_Func menuFunc;
 	boolean runningFunction;
 

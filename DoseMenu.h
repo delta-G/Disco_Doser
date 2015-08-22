@@ -8,6 +8,7 @@
 #include "DoseInterface.h"
 #include "DoseSchedule.h"
 #include "DS3234RTC.h"
+#include "MenuClass.h"
 
 #define LEAP_YEAR(Y)     ( ((1970+Y)>0) && !((1970+Y)%4) && ( ((1970+Y)%100) || !((1970+Y)%400) ) )
 
@@ -44,18 +45,18 @@ enum {
 
 
 
-void initMenu();
-void callMenu();
-void doMenu();
-void displayMenu();
+//void initMenu();
+//void callMenu();
+//void doMenu();
+//void displayMenu();
 const char * const* getMenuText(int, int);
 int getMenuSize(int);
 
-void notImplementedError();
-void branch_Base();
-void branch_Schedule();
-void branch_Pump();
-void branch_Container();
+boolean notImplementedError();
+//void branch_Base();
+//void branch_Schedule();
+//void branch_Pump();
+//void branch_Container();
 
 typedef void (*Branch_Function)();
 

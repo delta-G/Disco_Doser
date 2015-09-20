@@ -56,7 +56,7 @@ public:
 class MenuClass {
 
 	static MenuList *currentMenu;
-	int currentItemIndex;
+	static int currentItemIndex;
 	static boolean cancelFlag;
 	boolean runningFunction;
 

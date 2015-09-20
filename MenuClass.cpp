@@ -78,5 +78,6 @@ void MenuClass::displayMenu() {
 
 void MenuClass::setCurrentMenu(MenuList* aMenu){
 	currentMenu = aMenu;
+	currentItemIndex = 0;
 }
 

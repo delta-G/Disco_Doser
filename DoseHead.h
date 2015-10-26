@@ -35,20 +35,20 @@
  */
 
 #ifdef NEW_BOARD
+// Defined in REBL_UI.h
+//#define ENCODER_INTERRUPT_PIN 2
+//#define ENCODER_B_PIN 4
+//#define BUTTON_PIN 8
+//#define LCD_ENABLE_PIN A1
+//#define LCD_RS_PIN A3
+//#define HEART_BEAT_PIN A5
+//#define LCD_BLUE A0
+//#define LCD_GREEN A2
+//#define LCD_RED A4
 
-#define ENCODER_INTERRUPT_PIN 2
-#define ENCODER_B_PIN 4
 #define ALK_PUMP_PIN 6
 #define CAL_PUMP_PIN 9
-#define BUTTON_PIN 8
-#define LCD_ENABLE_PIN A3
 #define RTC_SS_PIN 10
-#define LCD_SS_PIN A1
-
-#define HEART_BEAT_PIN A5
-#define LCD_BLUE A0
-#define LCD_GREEN A2
-#define LCD_RED A4
 
 #else
 
@@ -83,8 +83,9 @@
 
 //#define CALIBRATION_TIME 30000ul   //Math requires hard coded value for now (see code)
 
-#define BUTTON_DEBOUNCE 50
-#define BUTTON_LONG_PRESS_TIME 2000
+// defined in REBL_UI.h
+//#define BUTTON_DEBOUNCE 50
+//#define BUTTON_LONG_PRESS_TIME 2000
 #define DEFAULT_VOLUME 20.0
 #define DEFAULT_RATE 20.0
 #define MIDNIGHT 1440

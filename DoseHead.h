@@ -110,12 +110,11 @@
 #define MAX_ALERTS 10
 #define ALERT_DELAY 5000ul
 
-#include "DoseInterface.h"
+
 #include "TimeOfDay.h"
 #include "DoseSchedule.h"
+#include "REBL_UI.h"
 #include "DoseMenu.h"
-#include "DoseInterface.h"
-#include "DoseDisplay.h"
 #include "DoseAlert.h"
 
 
@@ -126,7 +125,6 @@ enum StateVar {
 
 void alertHandler(DoseAlert*);
 void removeAlert(int);
-
 
 DoseSchedule* getSchedule(int);
 void doRunStateUI();

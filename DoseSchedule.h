@@ -9,6 +9,7 @@
 #include "DoseContainer.h"
 #include "DoseAlert.h"
 #include "DS3234RTC.h"
+#include "DoseHead.h"
 
 
 class DoseSchedule {

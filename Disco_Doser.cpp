@@ -1,7 +1,6 @@
 // Do not remove the include below
 #include "Disco_Doser.h"
-#include "Time.h"
-#include "githash.h"
+
 
 uint8_t heartbeatPin = HEART_BEAT_PIN; // I know it is redundant, but I want to be able to assign it with the rest of the pins in DoseHead.h
 uint8_t heartState = 0;

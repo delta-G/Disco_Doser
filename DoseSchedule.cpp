@@ -1,5 +1,4 @@
 #include "DoseSchedule.h"
-#include "DoseHead.h"
 
 void DoseSchedule::turnPumpOn() {
 	(pump).pumpOn();

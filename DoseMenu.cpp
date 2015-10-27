@@ -1,480 +1,89 @@
+/*
+ * DoseMenu.cpp
+ *
+ *  Created on: Oct 25, 2015
+ *      Author: David
+ */
+
 #include "DoseMenu.h"
 
-void (*menuFunction)();
+MenuItem PROGMEM mainMenuItems[] = {
+		{"Set Time" , setTheTime },
+		{"Schedule" , gotoScheduleMenu },
+		{"Single Dose" , singleDoseMenuItem },
+		{"Booster" , setBoosterDoseMenuItem },
+		{"Pump" , gotoPumpMenu },
+		{"Container" , gotoContainerMenu },
+		{"Run" , exitMenu }
+};
 
-Branch_Function menu_Branches[] = { &branch_Base, &branch_Schedule,
-		&branch_Pump, &branch_Container };
+MenuItem PROGMEM scheduleMenuItems[] = {
+		{"Set Schedule" , setScheduleMenuItem },
+		{"Set Name" , setScheduleNameMenuItem },
+		{"Adjust Volume" , adjustVolumeMenuItem },
+		{"Set Max Volume" , adjustMaxVolumeMenuItem },
+		{"Show Schedule" , showScheduleMenuItem },
+		{"Show State" , showScheduleStateMenuItem },
+		{"Match Schedule" , matchScheduleMenuItem },
+		{"Enable Schedule" , enableScheduleMenuItem },
+		{"Clear Saved" , clearSavedScheduleMenuItem },
+		{"Exit" , gotoMainMenu }
 
-int current_menu;
-int current_item;
+};
 
-boolean cancelFlag = false;
+MenuItem PROGMEM pumpMenuItems[] = {
+		{"Prime Pump" , primePumpMenuItem },
+		{"Cal Pump" , calibratePumpMenuItem },
+		{"Cal PWM" , calibratePwmMenuItem },
+		{"Show Cal" , showCalibrationMenuItem },
+		{"Exit" , gotoMainMenu }
+};
 
-// Allows outside code to call menuFunction without exposing it. 
-// And now includes the cancel code.
-void callMenu() {
+MenuItem PROGMEM containerMenuItems[] = {
+		{"Reset Cont" , resetContainerMenuItem },
+		{"Add to Cont" , addToContainerMenuItem },
+		{"Set Cont Vol" , setContainerVolumeMenuItem },
+		{"Set Cont Size" , setContainerSizeMenuItem },
+		{"Exit" , gotoMainMenu }
+};
 
-	if (checkButtonLongPress()) {
-		cancelFlag = true;
-	}
 
-	menuFunction();
+
+MenuList mainMenu(mainMenuItems, menuListSize(mainMenuItems));
+MenuList scheduleMenu(scheduleMenuItems, menuListSize(scheduleMenuItems));
+MenuList pumpMenu(pumpMenuItems, menuListSize(pumpMenuItems));
+MenuList containerMenu(containerMenuItems, menuListSize(containerMenuItems));
+
+
+
+
+void initMenu(){
+	reblMenu.setCurrentMenu(&mainMenu);
 }
 
-void initMenu() {
-	current_menu = 0;
-	current_item = 0;
-	menuFunction = doMenu;
+boolean exitMenu() {
+	setState(RUN_STATE);
+	return true;
 }
 
-void doMenu() {
-	cancelFlag = false; // If we're here it's either been cancelled or doesn't need to be.
-	showCursor(false);  // If we're here we don't need it.
-	if (isEncoderOn()) {
-		if (peekRotaryEncoder()) { //  Don't want to accept a button press if the menu updates on this pass.
-			useRotaryEncoder(current_item, 0);
-			//handle any rollover of the menu
-			if (current_item < 0) {
-				current_item = getMenuSize(current_menu) - 1; //subtract 1 cause it's an array index
-			} else if (current_item >= getMenuSize(current_menu))
-				current_item = 0;
-
-			buttonOff();  //  Kill the button since the display is updating
-		} else {   //Nothing on the encoder, so check the button
-
-			//  if button is on check and resolve it  but don't check button if there's been an encoder change
-			if (isButtonOn()) {
-				if (checkButton()) {
-					buttonOff();
-					encoderOff();
-					//  Set up to do the branch function on the next go
-					menuFunction = (*menu_Branches[current_menu]);
-					return;
-				}
-			} else // ELSE turn the button on
-			{
-				buttonOn();
-				encoderOn();
-			}
-		}
-	} else {   //  encoder is off
-		encoderOn();
-	}
-
-	displayMenu();
+boolean gotoMainMenu() {
+	reblMenu.setCurrentMenu(&mainMenu);
+	return true;
 }
 
-void displayMenu() {
-
-	int currentLine = 0;
-	char outBuf[NUM_LCD_COLS];
-
-	outBuf[0] = '-';
-	outBuf[1] = '>';
-	strcpy_P(outBuf + 2,
-			(char*) pgm_read_word((getMenuText(current_menu, current_item))));
-	displayLineLeft(currentLine++, outBuf);
-	outBuf[0] = ' ';
-	outBuf[1] = ' ';
-	strcpy_P(outBuf + 2,
-			(char*) pgm_read_word((getMenuText(current_menu, (current_item + 1) % getMenuSize(current_menu)))));
-	displayLineLeft(currentLine++, outBuf);
+boolean gotoScheduleMenu() {
+	reblMenu.setCurrentMenu(&scheduleMenu);
+	return true;
 }
 
-// Default action from the branch functions
-void notImplementedError() {
-	static unsigned long prevMil;
-	static int state = 0;
-	switch (state) {
-
-	case 0:
-		prevMil = millis();
-		state = 1;
-		//  No break, fallthrough and do the display too
-
-	case 1:
-		if (millis() - prevMil > 4000) {
-			state = 0;
-			//current_menu = (BASE_MENU);
-			//current_item = 0;
-			menuFunction = doMenu;
-		} else {
-			displayLineLeft(0, F("Oops Something's"));
-			displayLineLeft(1, F("Not Implemented"));
-		}
-	}
+boolean gotoPumpMenu() {
+	reblMenu.setCurrentMenu(&pumpMenu);
+	return true;
 }
 
-//  This gets run if a menu item gets selected. 
-void branch_Base() {
-	switch (current_item) {
-
-	case SET_TIME: {
-		if (setTheTime()) {
-			current_menu = (BASE_MENU);
-			current_item = 0;
-			menuFunction = doMenu;
-		}
-		break;
-	}
-
-	case SCHEDULE: {
-		current_menu = (SCHEDULE_MENU);
-		current_item = 0;
-		menuFunction = doMenu;
-		break;
-	}
-
-	case SINGLE_DOSE: {
-		if (singleDoseMenuItem()) {
-			current_menu = (BASE_MENU);
-			current_item = 0;
-			menuFunction = doMenu;
-		}
-		break;
-	}
-
-	case BOOSTER: {
-		if (setBoosterDoseMenuItem()) {
-			current_menu = (BASE_MENU);
-			current_item = 0;
-			menuFunction = doMenu;
-		}
-		break;
-	}
-
-	case PUMP: {
-		current_menu = (PUMP_MENU);
-		current_item = 0;
-		menuFunction = doMenu;
-		break;
-	}
-
-	case CONTAINER: {
-		current_menu = (CONTAINER_MENU);
-		current_item = 0;
-		menuFunction = doMenu;
-		break;
-	}
-
-	case RUN:
-		setState(RUN_STATE);
-		break;
-
-	default:
-		menuFunction = notImplementedError;
-
-	}  // end switch (current_item)
-}
-
-void branch_Schedule() {
-	switch (current_item) {
-	case SET_SCHEDULE: {
-		if (setScheduleMenuItem()) {
-			current_menu = (SCHEDULE_MENU);
-			current_item = 0;
-			menuFunction = doMenu;
-		}
-		break;
-	}
-
-	case SET_SCHEDULE_NAME: {
-		if (setScheduleNameMenuItem()) {
-			current_menu = (SCHEDULE_MENU);
-			current_item = 0;
-			menuFunction = doMenu;
-		}
-		break;
-	}
-
-	case ADJUST_VOLUME: {
-		if (adjustVolumeMenuItem()) {
-			current_menu = (SCHEDULE_MENU);
-			current_item = 0;
-			menuFunction = doMenu;
-		}
-		break;
-	}
-
-	case ADJUST_MAX: {
-		if (adjustMaxVolumeMenuItem()) {
-			current_menu = (SCHEDULE_MENU);
-			current_item = 0;
-			menuFunction = doMenu;
-		}
-		break;
-	}
-
-	case SHOW_SCHEDULE: {
-		if (showScheduleMenuItem()) {
-			current_menu = (SCHEDULE_MENU);
-			current_item = 0;
-			menuFunction = doMenu;
-		}
-		break;
-	}
-
-	case SHOW_STATE: {
-		if (showScheduleStateMenuItem()) {
-			current_menu = (SCHEDULE_MENU);
-			current_item = 0;
-			menuFunction = doMenu;
-		}
-
-		break;
-	}
-
-	case MATCH_SCHEDULE: {
-		if (matchScheduleMenuItem()) {
-			current_menu = (SCHEDULE_MENU);
-			current_item = 0;
-			menuFunction = doMenu;
-		}
-		break;
-	}
-
-	case ENABLE_SCHEDULE: {
-		if (enableScheduleMenuItem()) {
-			current_menu = (SCHEDULE_MENU);
-			current_item = 0;
-			menuFunction = doMenu;
-		}
-		break;
-	}
-
-//	case SAVE_SCHEDULE: {
-//		for (int pump_count = 0; pump_count < NUMBER_OF_PUMPS; pump_count++) {
-//			getSchedule(pump_count)->saveSchedule();
-//		}
-//		current_menu = (SCHEDULE_MENU);
-//		current_item = 0;
-//		menuFunction = doMenu;
-//		break;
-//	}
-//
-//	case GET_SAVED: {
-//		for (int pump_count = 0; pump_count < NUMBER_OF_PUMPS; pump_count++) {
-//			getSchedule(pump_count)->getSchedule();
-//		}
-//		current_menu = (SCHEDULE_MENU);
-//		current_item = 0;
-//		menuFunction = doMenu;
-//		break;
-//	}
-
-	case CLEAR_SAVED: {
-		for (int pump_count = 0; pump_count < NUMBER_OF_PUMPS; pump_count++) {
-			getSchedule(pump_count)->saveSchedule(0);
-		}
-		current_menu = (SCHEDULE_MENU);
-		current_item = 0;
-		menuFunction = doMenu;
-		break;
-	}
-
-	case EXIT_SCHED_MENU: {
-		current_menu = BASE_MENU;
-		current_item = 0;
-		menuFunction = doMenu;
-		break;
-	}
-	default:
-		menuFunction = notImplementedError;
-	}  //  end switch (current_item)
-
-}
-
-void branch_Container() {
-	switch (current_item) {
-	case RESET_CONTAINER: {
-		if (resetContainerMenuItem()) {
-			current_menu = (CONTAINER_MENU);
-			current_item = 0;
-			menuFunction = doMenu;
-		}
-
-		break;
-	}
-
-	case ADD_TO_CONTAINER: {
-		if (addToContainerMenuItem()) {
-			current_menu = (CONTAINER_MENU);
-			current_item = 0;
-			menuFunction = doMenu;
-		}
-
-		break;
-	}
-
-	case SET_CONTAINER_VOLUME: {
-		if (setContainerVolumeMenuItem()) {
-			current_menu = (CONTAINER_MENU);
-			current_item = 0;
-			menuFunction = doMenu;
-		}
-		break;
-	}
-
-	case SET_CONTAINER_SIZE: {
-		if (setContainerSizeMenuItem()) {
-			current_menu = (CONTAINER_MENU);
-			current_item = 0;
-			menuFunction = doMenu;
-		}
-		break;
-	}
-
-	case EXIT_CONT_MENU: {
-		current_menu = BASE_MENU;
-		current_item = 0;
-		menuFunction = doMenu;
-		break;
-	}
-	default:
-		menuFunction = notImplementedError;
-	}  // end switch (current_item)
-}
-
-void branch_Pump() {
-	switch (current_item) {
-	case PRIME_PUMP: {
-		if (primePumpMenuItem()) {
-			current_menu = (PUMP_MENU);
-			current_item = PRIME_PUMP;
-			menuFunction = doMenu;
-		}
-		break;
-	}
-
-	case CALIBRATE_PUMP: {
-		if (calibratePumpMenuItem()) {
-			current_menu = (PUMP_MENU);
-			current_item = CALIBRATE_PUMP;
-			menuFunction = doMenu;
-		}
-		break;
-
-	}
-
-	case CALIBRATE_PWM: {
-		if (calibratePwmMenuItem()) {
-			current_menu = (PUMP_MENU);
-			current_item = 0;
-			menuFunction = doMenu;
-		}
-		break;
-	}
-
-	case SHOW_CALIBRATION: {
-		if (showCalibrationMenuItem()) {
-			current_menu = (PUMP_MENU);
-			current_item = 0;
-			menuFunction = doMenu;
-		}
-		break;
-	}
-
-	case EXIT_PUMP_MENU: {
-		current_menu = BASE_MENU;
-		current_item = 0;
-		menuFunction = doMenu;
-		break;
-	}
-	default:
-		menuFunction = notImplementedError;
-	}  // end switch (current_item)
-
-}
-
-boolean inputTime(time_t& var) {
-
-	static int state = 0;
-	static tmElements_t tmElem;
-	breakTime(var, tmElem);
-
-	switch (state) {
-
-	case 0: {      // get set up
-		encoderOn();
-		buttonOn();
-		state++;
-		break;
-	}
-	case 1: {  // input the hours
-		if (checkButton()) {
-			state++;
-			break;
-		}
-		int setHour = tmElem.Hour;   // Have to do this for wraparound
-		useRotaryEncoder(setHour, 0, 23);  // Otherwise this uses unsigned vars.
-		tmElem.Hour = setHour;
-		setCursor(0, 1);
-		break;
-	}
-	case 2: {  // input the minutes
-		if (checkButton()) {
-			state++;
-			break;
-		}
-		int setMinute = tmElem.Minute;
-		useRotaryEncoder(setMinute, 0, 59);
-		tmElem.Minute = setMinute;
-		setCursor(0, 4);
-		break;
-	}
-	case 3: {   // input the year
-		if (checkButton()) {
-			state++;
-			break;
-		}
-		useRotaryEncoder(tmElem.Year, 1);
-		setCursor(1, 9);
-		break;
-	}
-	case 4: {  // input the month
-
-		if (checkButton()) {
-			state++;
-			break;
-		}
-		useRotaryEncoder(tmElem.Month, (byte) 1, (byte) 12); // OK to use unsigned vars since 0 will wrap around.
-		setCursor(1, 1);
-		break;
-	}
-	case 5: {  // input the day
-
-		if (checkButton()) {
-			state++;
-			break;
-		}
-		byte monthDays[] = { 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 };
-		if (LEAP_YEAR(tmElem.Year)) {
-			monthDays[1] = 29;
-		}
-		useRotaryEncoder(tmElem.Day, (byte) 1, monthDays[tmElem.Month - 1]);
-		setCursor(1, 4);
-		break;
-	}
-	case 6: { // wrap it up and let the caller know we're done with his variable. var should still be OK from the last time we touched it.
-		state = 0;
-		encoderOff();
-		buttonOff();
-		showCursor(false);
-		return true;
-	}
-
-	}  // end of switch (state)
-
-	if (cancelFlag) {
-		state = 0;
-		encoderOff();
-		buttonOff();
-		showCursor(false);
-		return true;
-	}
-
-	var = makeTime(tmElem);
-	return false;
+boolean gotoContainerMenu() {
+	reblMenu.setCurrentMenu(&containerMenu);
+	return true;
 }
 
 boolean inputTimeOfDay(TimeOfDay& var) {
@@ -522,7 +131,7 @@ boolean inputTimeOfDay(TimeOfDay& var) {
 
 	}  // end of switch (state)
 
-	if (cancelFlag) {
+	if (reblMenu.cancelFlag) {
 		state = 0;
 		encoderOff();
 		buttonOff();
@@ -561,7 +170,7 @@ boolean setTheTime() {
 			buttonOff();
 			state = 0;
 			// reinitialize schedules.
-			for(int i = 0; i < NUMBER_OF_PUMPS; i++){
+			for (int i = 0; i < NUMBER_OF_PUMPS; i++) {
 				getSchedule(i)->initSchedule();
 			}
 			return true;
@@ -570,19 +179,7 @@ boolean setTheTime() {
 	}
 	}  // end swtich (state)
 
-	tmElements_t tmE;
-	breakTime(timeSetTime, tmE);
-
-	char outBuf[2][NUM_LCD_COLS + 1];
-	sprintf_P(outBuf[0], PSTR("%02d:%02d:%02d"), tmE.Hour, tmE.Minute,
-			tmE.Second);
-	sprintf_P(outBuf[1], PSTR("%02d-%02d-%04d"), tmE.Month, tmE.Day,
-			tmE.Year + 1970);
-
-	displayLineLeft(0, outBuf[0]);
-	displayLineLeft(1, outBuf[1]);
-
-	if (cancelFlag) {
+	if (reblMenu.cancelFlag) {
 		state = 0;
 		buttonOff();
 		return true;
@@ -660,7 +257,7 @@ boolean singleDoseMenuItem() {
 	}
 	} // end switch (state)
 
-	if (cancelFlag) {
+	if (reblMenu.cancelFlag) {
 		state = 0;
 		encoderOff();
 		buttonOff();
@@ -717,7 +314,8 @@ boolean setBoosterDoseMenuItem() {
 			maxAllow = MAXIMUM_BOOSTER_DOSE;
 		}
 
-		int minAllow = -(getSchedule(scheduleChoice)->getDailyVolume() * (MAXIMUM_BOOSTER_DAYS - 1));
+		int minAllow = -(getSchedule(scheduleChoice)->getDailyVolume()
+				* (MAXIMUM_BOOSTER_DAYS - 1));
 
 		useRotaryEncoder(volumeChoice, minAllow, maxAllow);
 		char buf[11];
@@ -736,9 +334,11 @@ boolean setBoosterDoseMenuItem() {
 		if (volumeChoice > 0) {
 			minDays = (volumeChoice
 					/ (getSchedule(scheduleChoice)->getMaxVolume()
-							- getSchedule(scheduleChoice)->getDailyVolume())) + 1;
+							- getSchedule(scheduleChoice)->getDailyVolume()))
+					+ 1;
 		} else {
-			minDays = (volumeChoice / getSchedule(scheduleChoice)->getDailyVolume()) + 1;
+			minDays = (volumeChoice
+					/ getSchedule(scheduleChoice)->getDailyVolume()) + 1;
 		}
 
 		useRotaryEncoder(daysChoice, minDays, MAXIMUM_BOOSTER_DAYS);
@@ -757,7 +357,7 @@ boolean setBoosterDoseMenuItem() {
 
 	} // end switch (state)
 
-	if (cancelFlag) {
+	if (reblMenu.cancelFlag) {
 		state = 0;
 		encoderOff();
 		buttonOff();
@@ -864,7 +464,7 @@ boolean setScheduleMenuItem() {
 
 	} // end switch (state)
 
-	if (cancelFlag) {
+	if (reblMenu.cancelFlag) {
 		state = 0;
 		encoderOff();
 		buttonOff();
@@ -980,7 +580,7 @@ boolean adjustVolumeMenuItem() {
 
 	} // end switch (state)
 
-	if (cancelFlag) {
+	if (reblMenu.cancelFlag) {
 		state = 0;
 		encoderOff();
 		buttonOff();
@@ -1041,7 +641,7 @@ boolean adjustMaxVolumeMenuItem() {
 
 	} // end switch (state)
 
-	if (cancelFlag) {
+	if (reblMenu.cancelFlag) {
 		state = 0;
 		encoderOff();
 		buttonOff();
@@ -1263,7 +863,7 @@ boolean enableScheduleMenuItem() {
 		displayLineLeft(1, choice ? F("->Enable"):F("->Disable"));
 		break;
 	}
-	//  ERROR CASE
+		//  ERROR CASE
 	case 3: {
 		prevMillis = millis();
 		state++;
@@ -1285,7 +885,13 @@ boolean enableScheduleMenuItem() {
 
 }			//end switch (state)
 	return false;
+}
 
+boolean clearSavedScheduleMenuItem() {
+	for (int pump_count = 0; pump_count < NUMBER_OF_PUMPS; pump_count++) {
+		getSchedule(pump_count)->saveSchedule(0);
+	}
+	return true;
 }
 
 boolean resetContainerMenuItem() {
@@ -1330,7 +936,7 @@ boolean resetContainerMenuItem() {
 
 	} // end switch (state)
 
-	if (cancelFlag) {
+	if (reblMenu.cancelFlag) {
 		state = 0;
 		encoderOff();
 		buttonOff();
@@ -1402,7 +1008,7 @@ boolean addToContainerMenuItem() {
 
 	} // end switch (state)
 
-	if (cancelFlag) {
+	if (reblMenu.cancelFlag) {
 		state = 0;
 		encoderOff();
 		buttonOff();
@@ -1474,7 +1080,7 @@ boolean setContainerVolumeMenuItem() {
 
 	} // end switch (state)
 
-	if (cancelFlag) {
+	if (reblMenu.cancelFlag) {
 		state = 0;
 		encoderOff();
 		buttonOff();
@@ -1544,7 +1150,7 @@ boolean setContainerSizeMenuItem() {
 
 	} // end switch (state)
 
-	if (cancelFlag) {
+	if (reblMenu.cancelFlag) {
 		state = 0;
 		encoderOff();
 		buttonOff();
@@ -1769,7 +1375,7 @@ boolean calibratePwmMenuItem() {
 			getSchedule(scheduleChoice)->turnPumpOff();
 			if (pwmSetPoint != oldSetPoint) {
 				getSchedule(scheduleChoice)->saveCal(1);  // save the new value
-				getSchedule(scheduleChoice)->saveCal(0);  // clear the calibration flag
+				getSchedule(scheduleChoice)->saveCal(0); // clear the calibration flag
 			}
 			encoderOff();
 			buttonOff();
@@ -1791,7 +1397,7 @@ boolean calibratePwmMenuItem() {
 }
 // What to do about the pump?   IS it on or off?  Have we even chosen a schedule yet?
 //  No cancel can be allowed without a flag of some sort.
-//	if (cancelFlag) {
+//	if (reblMenu.cancelFlag) {
 //			state = 0;
 //			encoderOff();
 //			buttonOff();
@@ -1849,3 +1455,4 @@ boolean showCalibrationMenuItem() {
 	return false;
 
 }
+

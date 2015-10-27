@@ -1,7 +1,6 @@
 // Do not remove the include below
 #include "Disco_Doser.h"
-#include "Time.h"
-#include "githash.h"
+
 
 uint8_t heartbeatPin = HEART_BEAT_PIN; // I know it is redundant, but I want to be able to assign it with the rest of the pins in DoseHead.h
 uint8_t heartState = 0;
@@ -11,9 +10,8 @@ void setup() {
 	//pinMode(3, OUTPUT); // Need a 5V line for my button and encoder right now. Easier to reach pin 3 than +5V right now.
 	//digitalWrite(3, HIGH); //These first two lines will come out in the final product
 	pinMode(heartbeatPin, OUTPUT);
-	initLCD();
-	initButton();
-	initEncoder();
+	initLCD(LCD_RS_PIN, LCD_ENABLE_PIN, LCD_RED, LCD_GREEN, LCD_BLUE);
+	initInterface(BUTTON_PIN, ENCODER_INTERRUPT_PIN, ENCODER_B_PIN);
 	RTC.begin(RTC_SS_PIN);
 	DoseAlert::setAlertHandler(alertHandler);
 	getSchedule(0)->startupCode(ALK_PUMP_PIN, EA_ALK_SCHEDULE, "Alk");

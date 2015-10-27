@@ -200,7 +200,7 @@ void doDoseStateUI() {
 }
 
 void doMenuStateUI() {
-	callMenu();
+	reblMenu.doMenu();
 }
 
 void doAlertStateUI() {

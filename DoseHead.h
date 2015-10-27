@@ -7,7 +7,6 @@
 //#define USING_SERIAL
 #define NEW_BOARD   // uses alternate pin assignments for home-brew board.
 
-
 /********  PIN ASSIGNMENTS   ********
  *
  * 0 -
@@ -18,9 +17,9 @@
  * 5 - Alk Pump
  * 6 - Cal Pump
  * 7 - Button Pin
- * 8 - LCD Enable Pin
+ * 8 - LCD RS Pin
  * 9 - SS for RTC
- * 10 - SS for LCD
+ * 10 - LCD ENABLE PIN
  * 11 - MOSI
  * 12 - MISO
  * 13 - SCK
@@ -35,20 +34,21 @@
  */
 
 #ifdef NEW_BOARD
+// New board does not use the above pin assignments
 
 #define ENCODER_INTERRUPT_PIN 2
 #define ENCODER_B_PIN 4
-#define ALK_PUMP_PIN 6
-#define CAL_PUMP_PIN 9
 #define BUTTON_PIN 8
-#define LCD_ENABLE_PIN A3
-#define RTC_SS_PIN 10
-#define LCD_SS_PIN A1
-
+#define LCD_ENABLE_PIN A1
+#define LCD_RS_PIN A3
 #define HEART_BEAT_PIN A5
 #define LCD_BLUE A0
 #define LCD_GREEN A2
 #define LCD_RED A4
+
+#define ALK_PUMP_PIN 6
+#define CAL_PUMP_PIN 9
+#define RTC_SS_PIN 10
 
 #else
 
@@ -83,8 +83,9 @@
 
 //#define CALIBRATION_TIME 30000ul   //Math requires hard coded value for now (see code)
 
-#define BUTTON_DEBOUNCE 50
-#define BUTTON_LONG_PRESS_TIME 2000
+// defined in REBL_UI.h
+//#define BUTTON_DEBOUNCE 50
+//#define BUTTON_LONG_PRESS_TIME 2000
 #define DEFAULT_VOLUME 20.0
 #define DEFAULT_RATE 20.0
 #define MIDNIGHT 1440
@@ -110,12 +111,11 @@
 #define MAX_ALERTS 10
 #define ALERT_DELAY 5000ul
 
-#include "DoseInterface.h"
+
 #include "TimeOfDay.h"
 #include "DoseSchedule.h"
+#include "REBL_UI.h"
 #include "DoseMenu.h"
-#include "DoseInterface.h"
-#include "DoseDisplay.h"
 #include "DoseAlert.h"
 
 
@@ -126,7 +126,6 @@ enum StateVar {
 
 void alertHandler(DoseAlert*);
 void removeAlert(int);
-
 
 DoseSchedule* getSchedule(int);
 void doRunStateUI();

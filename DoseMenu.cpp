@@ -131,7 +131,7 @@ boolean inputTimeOfDay(TimeOfDay& var) {
 
 	}  // end of switch (state)
 
-	if (reblMenu.cancelFlag) {
+	if (reblMenu.isCancelled()) {
 		state = 0;
 		encoderOff();
 		buttonOff();
@@ -179,7 +179,7 @@ boolean setTheTime() {
 	}
 	}  // end swtich (state)
 
-	if (reblMenu.cancelFlag) {
+	if (reblMenu.isCancelled()) {
 		state = 0;
 		buttonOff();
 		return true;
@@ -257,7 +257,7 @@ boolean singleDoseMenuItem() {
 	}
 	} // end switch (state)
 
-	if (reblMenu.cancelFlag) {
+	if (reblMenu.isCancelled()) {
 		state = 0;
 		encoderOff();
 		buttonOff();
@@ -357,7 +357,7 @@ boolean setBoosterDoseMenuItem() {
 
 	} // end switch (state)
 
-	if (reblMenu.cancelFlag) {
+	if (reblMenu.isCancelled()) {
 		state = 0;
 		encoderOff();
 		buttonOff();
@@ -464,7 +464,7 @@ boolean setScheduleMenuItem() {
 
 	} // end switch (state)
 
-	if (reblMenu.cancelFlag) {
+	if (reblMenu.isCancelled()) {
 		state = 0;
 		encoderOff();
 		buttonOff();
@@ -580,7 +580,7 @@ boolean adjustVolumeMenuItem() {
 
 	} // end switch (state)
 
-	if (reblMenu.cancelFlag) {
+	if (reblMenu.isCancelled()) {
 		state = 0;
 		encoderOff();
 		buttonOff();
@@ -641,7 +641,7 @@ boolean adjustMaxVolumeMenuItem() {
 
 	} // end switch (state)
 
-	if (reblMenu.cancelFlag) {
+	if (reblMenu.isCancelled()) {
 		state = 0;
 		encoderOff();
 		buttonOff();
@@ -936,7 +936,7 @@ boolean resetContainerMenuItem() {
 
 	} // end switch (state)
 
-	if (reblMenu.cancelFlag) {
+	if (reblMenu.isCancelled()) {
 		state = 0;
 		encoderOff();
 		buttonOff();
@@ -1008,7 +1008,7 @@ boolean addToContainerMenuItem() {
 
 	} // end switch (state)
 
-	if (reblMenu.cancelFlag) {
+	if (reblMenu.isCancelled()) {
 		state = 0;
 		encoderOff();
 		buttonOff();
@@ -1080,7 +1080,7 @@ boolean setContainerVolumeMenuItem() {
 
 	} // end switch (state)
 
-	if (reblMenu.cancelFlag) {
+	if (reblMenu.isCancelled()) {
 		state = 0;
 		encoderOff();
 		buttonOff();
@@ -1150,7 +1150,7 @@ boolean setContainerSizeMenuItem() {
 
 	} // end switch (state)
 
-	if (reblMenu.cancelFlag) {
+	if (reblMenu.isCancelled()) {
 		state = 0;
 		encoderOff();
 		buttonOff();
@@ -1397,7 +1397,7 @@ boolean calibratePwmMenuItem() {
 }
 // What to do about the pump?   IS it on or off?  Have we even chosen a schedule yet?
 //  No cancel can be allowed without a flag of some sort.
-//	if (reblMenu.cancelFlag) {
+//	if (reblMenu.isCancelled()) {
 //			state = 0;
 //			encoderOff();
 //			buttonOff();

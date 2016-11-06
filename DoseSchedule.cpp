@@ -226,9 +226,11 @@ void DoseSchedule::initSchedule() {
 
 void DoseSchedule::resetSchedule() {
 	target_volume = set_volume;
-	if (booster_volume > 0) {
+//	Don't need this to be in an if since addBooster takes care of the case that there is no booster
+//	but this wouldn't allow for negative booster amounts.
+//	if (booster_volume > 0) {
 		addBooster();   // This is where we pick up the booster
-	}
+//	}
 
 	if (target_volume > maxVolume) {
 		volExceedAlert.setActive(true, 2, name, F("Max Vol Exceed"));

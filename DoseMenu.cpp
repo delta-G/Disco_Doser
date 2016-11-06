@@ -310,12 +310,17 @@ boolean setBoosterDoseMenuItem() {
 		int maxAllow = ((getSchedule(scheduleChoice)->getMaxVolume()
 				- getSchedule(scheduleChoice)->getDailyVolume())
 				* (MAXIMUM_BOOSTER_DAYS - 1));
+		maxAllow -= getSchedule(scheduleChoice)->getBoosterVolume();
 		if (maxAllow > MAXIMUM_BOOSTER_DOSE) {
 			maxAllow = MAXIMUM_BOOSTER_DOSE;
 		}
 
 		int minAllow = -(getSchedule(scheduleChoice)->getDailyVolume()
 				* (MAXIMUM_BOOSTER_DAYS - 1));
+		minAllow -= getSchedule(scheduleChoice)->getBoosterVolume();
+//		if (minAllow > -(getSchedule(scheduleChoice)->getBoosterVolume())){
+//			minAllow = -(getSchedule(scheduleChoice)->getBoosterVolume());
+//		}
 
 		useRotaryEncoder(volumeChoice, minAllow, maxAllow);
 		char buf[11];

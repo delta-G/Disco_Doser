@@ -229,7 +229,7 @@ void DoseSchedule::resetSchedule() {
 //	Don't need this to be in an if since addBooster takes care of the case that there is no booster
 //	but this wouldn't allow for negative booster amounts.
 //	if (booster_volume > 0) {
-		addBooster();   // This is where we pick up the booster
+	addBooster();   // This is where we pick up the booster
 //	}
 
 	if (target_volume > maxVolume) {
@@ -381,9 +381,14 @@ void DoseSchedule::addBooster() {
 	// This function adds a full days worth of booster dose to the target.
 	// It should only be called at the beginning or at worst very early
 	// in the schedule window.
-	if (booster_days > 0)  //  booster days = 0 would break things
-			{
+
+	//  booster days = 0 would break things
+	if (booster_days > 0) {
 		int day_volume = booster_volume / booster_days; // on day = 1 it should do everything left
+		// if day_volume is negative it can't knock the whole day into the negative.  Negative dosing is impossible.
+		if (day_volume < -target_volume) {
+			day_volume = -target_volume;
+		}
 
 		target_volume += day_volume; // add it to the days target, and the calculateVolume function handles the rest
 
@@ -591,8 +596,8 @@ boolean DoseSchedule::getState() {
 
 	if ((isInRange(TimeOfDay(savedTime)))
 			&& (minutesOld
-					< (TimeOfDay::lengthOfTime(TimeOfDay(savedTime), end_time) % MIDNIGHT))
-			&& (goodFlag >> 8 == 0x1F)) {
+					< (TimeOfDay::lengthOfTime(TimeOfDay(savedTime), end_time)
+							% MIDNIGHT)) && (goodFlag >> 8 == 0x1F)) {
 		int lt;
 		addr += readRTC_SRAM(addr, lt);
 		last_time.setTime(lt);

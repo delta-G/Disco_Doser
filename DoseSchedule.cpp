@@ -64,7 +64,6 @@ void DoseSchedule::startupCode(byte apin, int aloc, char* aname) {
 	pump.initPump(apin);
 	turnPumpOff();
 	eeprom_location = aloc;
-	//name = aname;
 	setName(aname);
 	container.setName(name);
 	if (!getScheduleFromEEPROM()) {
@@ -594,10 +593,11 @@ boolean DoseSchedule::getState() {
 		minutesOld = (currentTime - savedTime + 30) / 60;
 	}
 
-	if ((isInRange(TimeOfDay(savedTime)))
-			&& (minutesOld
-					< (TimeOfDay::lengthOfTime(TimeOfDay(savedTime), end_time)
-							% MIDNIGHT)) && (goodFlag >> 8 == 0x1F)) {
+
+	boolean sameDay = ((minutesOld < TimeOfDay::lengthOfTime(TimeOfDay(savedTime), end_time)) &&  isInRange(TimeOfDay(savedTime))
+			&& (isInRange(TimeOfDay(currentTime))));
+
+	if (sameDay && (goodFlag >> 8 == 0x1F)) {
 		int lt;
 		addr += readRTC_SRAM(addr, lt);
 		last_time.setTime(lt);
